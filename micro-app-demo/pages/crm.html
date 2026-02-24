@@ -1,0 +1,333 @@
+<title>Client Dashboard</title>
+
+<div
+  x-data="{
+    page: 'dashboard',
+    selectedClient: null,
+    clients: [
+      { id: 1, name: 'Acme Corp', contact: 'John Smith', email: 'john@acme.com', status: 'active', revenue: 48500, deals: 3, lastContact: '2 days ago' },
+      { id: 2, name: 'Globex Inc', contact: 'Jane Doe', email: 'jane@globex.com', status: 'active', revenue: 124000, deals: 7, lastContact: '1 week ago' },
+      { id: 3, name: 'Initech', contact: 'Peter Gibbons', email: 'peter@initech.com', status: 'inactive', revenue: 12300, deals: 1, lastContact: '3 weeks ago' },
+      { id: 4, name: 'Stark Industries', contact: 'Pepper Potts', email: 'pepper@stark.com', status: 'active', revenue: 340000, deals: 12, lastContact: 'Today' },
+      { id: 5, name: 'Wayne Enterprises', contact: 'Lucius Fox', email: 'lucius@wayne.com', status: 'lead', revenue: 0, deals: 0, lastContact: '5 days ago' },
+    ],
+    get totalRevenue() { return this.clients.reduce((s, c) => s + c.revenue, 0) },
+    get activeClients() { return this.clients.filter(c => c.status === 'active').length },
+    get totalDeals() { return this.clients.reduce((s, c) => s + c.deals, 0) },
+    formatCurrency(n) { return '$' + n.toLocaleString('en-US') },
+    openClient(client) { this.selectedClient = client; this.page = 'detail'; },
+    goBack() { this.page = 'dashboard'; this.selectedClient = null; },
+    statusColor(s) {
+      if (s === 'active') return 'background: #dcfce7; color: #166534';
+      if (s === 'inactive') return 'background: #fee2e2; color: #991b1b';
+      return 'background: #dbeafe; color: #1e40af';
+    }
+  }"
+  class="micro-app-shell"
+>
+  <!-- ═══ DASHBOARD PAGE ═══ -->
+  <template x-if="page === 'dashboard'">
+    <div>
+      <!-- Header -->
+      <div class="px-8 pt-8 pb-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="micro-app-title">
+              Client Dashboard
+            </h1>
+            <p class="micro-app-subtitle mt-1">
+              Manage your client portfolio
+            </p>
+          </div>
+          <span class="micro-app-badge"
+            >Multi-page Demo</span
+          >
+        </div>
+      </div>
+
+      <hr class="micro-app-divider" style="margin: 0" />
+
+      <!-- Stats row -->
+      <div class="grid grid-cols-3 gap-4 px-8 py-6">
+        <div
+          class="micro-app-section"
+          style="text-align: center; padding: 16px"
+        >
+          <span class="micro-app-label">Total Revenue</span>
+          <p
+            style="
+              font-size: 1.5rem;
+              font-weight: 700;
+              letter-spacing: -0.02em;
+              font-variant-numeric: tabular-nums;
+            "
+            x-text="formatCurrency(totalRevenue)"
+          ></p>
+        </div>
+        <div
+          class="micro-app-section"
+          style="text-align: center; padding: 16px"
+        >
+          <span class="micro-app-label"
+            >Active Clients</span
+          >
+          <p
+            style="font-size: 1.5rem; font-weight: 700"
+            x-text="activeClients + ' / ' + clients.length"
+          ></p>
+        </div>
+        <div
+          class="micro-app-section"
+          style="text-align: center; padding: 16px"
+        >
+          <span class="micro-app-label">Open Deals</span>
+          <p
+            style="
+              font-size: 1.5rem;
+              font-weight: 700;
+              font-variant-numeric: tabular-nums;
+            "
+            x-text="totalDeals"
+          ></p>
+        </div>
+      </div>
+
+      <!-- Client list -->
+      <div class="px-8 pb-8">
+        <div
+          style="
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+          "
+        >
+          <!-- Table header -->
+          <div
+            class="grid grid-cols-12 gap-2 px-4 py-2.5"
+            style="
+              background: var(--muted);
+              border-bottom: 1px solid var(--border);
+            "
+          >
+            <span
+              class="micro-app-label col-span-4"
+              style="margin: 0"
+              >Client</span
+            >
+            <span
+              class="micro-app-label col-span-3"
+              style="margin: 0"
+              >Contact</span
+            >
+            <span
+              class="micro-app-label col-span-2"
+              style="margin: 0; text-align: right"
+              >Revenue</span
+            >
+            <span
+              class="micro-app-label col-span-1"
+              style="margin: 0; text-align: center"
+              >Deals</span
+            >
+            <span
+              class="micro-app-label col-span-2"
+              style="margin: 0; text-align: right"
+              >Status</span
+            >
+          </div>
+
+          <!-- Rows -->
+          <template
+            x-for="client in clients"
+            :key="client.id"
+          >
+            <div
+              @click="openClient(client)"
+              class="grid cursor-pointer grid-cols-12 items-center gap-2 px-4 py-3 transition-colors"
+              style="border-bottom: 1px solid var(--border)"
+              :style="$el === $el.parentElement.lastElementChild ? 'border-bottom: none' : ''"
+              onmouseenter="
+                this.style.background = 'var(--accent)'
+              "
+              onmouseleave="
+                this.style.background = 'transparent'
+              "
+            >
+              <div class="col-span-4">
+                <span
+                  style="
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                  "
+                  x-text="client.name"
+                ></span>
+              </div>
+              <div class="col-span-3">
+                <span
+                  class="micro-app-subtitle"
+                  x-text="client.contact"
+                ></span>
+              </div>
+              <div
+                class="col-span-2"
+                style="text-align: right"
+              >
+                <span
+                  style="
+                    font-size: 0.875rem;
+                    font-weight: 600;
+                    font-variant-numeric: tabular-nums;
+                  "
+                  x-text="formatCurrency(client.revenue)"
+                ></span>
+              </div>
+              <div
+                class="col-span-1"
+                style="text-align: center"
+              >
+                <span
+                  style="
+                    font-size: 0.875rem;
+                    font-variant-numeric: tabular-nums;
+                  "
+                  x-text="client.deals"
+                ></span>
+              </div>
+              <div class="col-span-2 flex justify-end">
+                <span
+                  class="micro-app-badge"
+                  :style="statusColor(client.status)"
+                  x-text="client.status"
+                ></span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ═══ CLIENT DETAIL PAGE ═══ -->
+  <template x-if="page === 'detail' && selectedClient">
+    <div>
+      <!-- Header with back -->
+      <div class="px-8 pt-6 pb-5">
+        <button
+          @click="goBack()"
+          class="micro-app-btn micro-app-btn-ghost mb-3"
+          style="padding: 4px 8px; font-size: 0.75rem"
+        >
+          ← Back to Dashboard
+        </button>
+        <div class="flex items-center justify-between">
+          <div>
+            <h1
+              class="micro-app-title"
+              x-text="selectedClient.name"
+            ></h1>
+            <p
+              class="micro-app-subtitle mt-1"
+              x-text="selectedClient.email"
+            ></p>
+          </div>
+          <span
+            class="micro-app-badge"
+            :style="statusColor(selectedClient.status)"
+            x-text="selectedClient.status"
+          ></span>
+        </div>
+      </div>
+
+      <hr class="micro-app-divider" style="margin: 0" />
+
+      <!-- Client info cards -->
+      <div class="grid grid-cols-2 gap-4 px-8 py-6">
+        <div
+          class="micro-app-section"
+          style="padding: 20px"
+        >
+          <span class="micro-app-label"
+            >Primary Contact</span
+          >
+          <p
+            style="
+              font-size: 0.9375rem;
+              font-weight: 600;
+              margin-top: 2px;
+            "
+            x-text="selectedClient.contact"
+          ></p>
+          <p
+            class="micro-app-subtitle"
+            x-text="selectedClient.email"
+          ></p>
+        </div>
+        <div
+          class="micro-app-section"
+          style="padding: 20px"
+        >
+          <span class="micro-app-label">Last Contact</span>
+          <p
+            style="
+              font-size: 0.9375rem;
+              font-weight: 600;
+              margin-top: 2px;
+            "
+            x-text="selectedClient.lastContact"
+          ></p>
+          <p class="micro-app-subtitle">
+            Most recent interaction
+          </p>
+        </div>
+      </div>
+
+      <!-- Revenue & deals -->
+      <div class="grid grid-cols-2 gap-4 px-8 pb-6">
+        <div
+          class="micro-app-section"
+          style="text-align: center; padding: 24px"
+        >
+          <span class="micro-app-label">Total Revenue</span>
+          <p
+            class="micro-app-value"
+            style="font-size: 2rem; margin-top: 4px"
+            x-text="formatCurrency(selectedClient.revenue)"
+          ></p>
+        </div>
+        <div
+          class="micro-app-section"
+          style="text-align: center; padding: 24px"
+        >
+          <span class="micro-app-label">Active Deals</span>
+          <p
+            class="micro-app-value"
+            style="font-size: 2rem; margin-top: 4px"
+            x-text="selectedClient.deals"
+          ></p>
+        </div>
+      </div>
+
+      <hr
+        class="micro-app-divider"
+        style="margin: 0 32px"
+      />
+
+      <!-- Actions -->
+      <div class="flex gap-3 px-8 py-6">
+        <button
+          class="micro-app-btn micro-app-btn-primary flex-1"
+        >
+          Send Email
+        </button>
+        <button
+          class="micro-app-btn micro-app-btn-secondary flex-1"
+        >
+          Schedule Call
+        </button>
+        <button class="micro-app-btn micro-app-btn-ghost">
+          Edit
+        </button>
+      </div>
+    </div>
+  </template>
+</div>

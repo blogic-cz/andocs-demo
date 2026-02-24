@@ -1,0 +1,166 @@
+/* ── Andocs Micro-App Smart Defaults ────────────────────────────────
+   These styles provide a polished baseline for any micro-app.
+   Design tokens from the parent Andocs app are available as CSS
+   custom properties (--primary, --background, --foreground, etc.).
+   ─────────────────────────────────────────────────────────────────── */
+
+/* ── Reset & Base ───────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Shell / Card ───────────────────────────────────────────────── */
+
+.micro-app-shell {
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 2);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+/* ── Typography ─────────────────────────────────────────────────── */
+
+.micro-app-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  line-height: 1.25;
+}
+
+.micro-app-subtitle {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.micro-app-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+  margin-bottom: 4px;
+}
+
+.micro-app-value {
+  font-size: 2.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+
+.micro-app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.micro-app-btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.micro-app-btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: var(--shadow-sm);
+}
+
+.micro-app-btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: var(--shadow);
+}
+
+.micro-app-btn-primary:active {
+  filter: brightness(0.95);
+}
+
+.micro-app-btn-secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+}
+
+.micro-app-btn-secondary:hover {
+  background: var(--accent);
+}
+
+.micro-app-btn-ghost {
+  background: transparent;
+  color: var(--muted-foreground);
+}
+
+.micro-app-btn-ghost:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.micro-app-btn[data-active="true"],
+.micro-app-btn.active {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Sections ───────────────────────────────────────────────────── */
+
+.micro-app-section {
+  padding: 20px;
+  border-radius: calc(var(--radius) * 1.5);
+  background: var(--muted);
+  border: 1px solid var(--border);
+}
+
+/* ── Divider ────────────────────────────────────────────────────── */
+
+.micro-app-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+/* ── Badge / Chip ───────────────────────────────────────────────── */
+
+.micro-app-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--accent);
+  color: var(--accent-foreground);
+}

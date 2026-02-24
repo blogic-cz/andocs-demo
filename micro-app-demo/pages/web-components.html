@@ -1,0 +1,143 @@
+<title>Web Components</title>
+<!-- Component definitions loaded from shared.js (auto-injected by andocs) -->
+
+<!-- ── 2. Use the components ────────────────────────────────────────── -->
+<main class="micro-app-shell mx-auto max-w-lg">
+  <!-- Header -->
+  <div class="space-y-1.5 px-8 pt-8 pb-5">
+    <div class="flex items-center justify-between">
+      <h1 class="micro-app-title">Web Components</h1>
+      <span class="micro-app-badge">No Build Required</span>
+    </div>
+    <p class="micro-app-subtitle">
+      Native Custom Elements with Shadow DOM, slots, and
+      observed attributes — all in plain HTML with a single
+      <code
+        class="rounded px-1 py-0.5 font-mono text-xs"
+        style="background: var(--muted)"
+        >&lt;script&gt;</code
+      >.
+    </p>
+  </div>
+
+  <hr class="micro-app-divider" style="margin: 0" />
+
+  <!-- Section 1: Status Badges (observed attributes) -->
+  <div class="px-8 pt-6 pb-2">
+    <span class="micro-app-label">Observed Attributes</span>
+    <p
+      class="micro-app-subtitle"
+      style="margin-bottom: 12px"
+    >
+      <code>&lt;status-badge status="active"&gt;</code>
+      reacts to attribute changes automatically.
+    </p>
+    <div class="flex flex-wrap gap-2">
+      <status-badge status="active"></status-badge>
+      <status-badge status="pending"></status-badge>
+      <status-badge status="inactive"></status-badge>
+    </div>
+  </div>
+
+  <hr class="micro-app-divider" style="margin: 16px 32px" />
+
+  <!-- Section 2: Slotted Card -->
+  <div class="px-8 py-2">
+    <span class="micro-app-label">Named Slots</span>
+    <p
+      class="micro-app-subtitle"
+      style="margin-bottom: 12px"
+    >
+      <code>&lt;info-card&gt;</code> uses
+      <code>slot="title"</code>, <code>slot="badge"</code>,
+      default slot, and <code>slot="footer"</code>.
+    </p>
+
+    <info-card>
+      <strong slot="title">Project Status</strong>
+      <status-badge
+        slot="badge"
+        status="active"
+      ></status-badge>
+      <p>
+        All systems operational. The deployment pipeline
+        completed successfully at 14:32 UTC with zero
+        errors.
+      </p>
+      <span slot="footer">Last updated: just now</span>
+    </info-card>
+  </div>
+
+  <hr class="micro-app-divider" style="margin: 16px 32px" />
+
+  <!-- Section 3: Interactive Toggle (custom events) -->
+  <div
+    class="px-8 pt-2 pb-6"
+    x-data="{ notifications: true, darkMode: false, analytics: true }"
+  >
+    <span class="micro-app-label">Custom Events</span>
+    <p
+      class="micro-app-subtitle"
+      style="margin-bottom: 12px"
+    >
+      <code>&lt;toggle-switch&gt;</code> dispatches a
+      <code>toggle</code> event on click. Wired to Alpine.js
+      state below.
+    </p>
+
+    <div class="space-y-3">
+      <div
+        class="micro-app-section flex items-center justify-between"
+        style="padding: 12px 16px"
+      >
+        <toggle-switch
+          label="Notifications"
+          checked
+          @toggle="notifications = $event.detail.checked"
+        ></toggle-switch>
+        <span
+          class="micro-app-subtitle"
+          x-text="notifications ? 'On' : 'Off'"
+        ></span>
+      </div>
+
+      <div
+        class="micro-app-section flex items-center justify-between"
+        style="padding: 12px 16px"
+      >
+        <toggle-switch
+          label="Dark Mode"
+          @toggle="darkMode = $event.detail.checked"
+        ></toggle-switch>
+        <span
+          class="micro-app-subtitle"
+          x-text="darkMode ? 'On' : 'Off'"
+        ></span>
+      </div>
+
+      <div
+        class="micro-app-section flex items-center justify-between"
+        style="padding: 12px 16px"
+      >
+        <toggle-switch
+          label="Analytics"
+          checked
+          @toggle="analytics = $event.detail.checked"
+        ></toggle-switch>
+        <span
+          class="micro-app-subtitle"
+          x-text="analytics ? 'On' : 'Off'"
+        ></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <hr class="micro-app-divider" style="margin: 0" />
+  <div class="px-8 py-5">
+    <p class="micro-app-subtitle">
+      Three custom elements. Zero dependencies. Works in all
+      modern browsers.
+    </p>
+  </div>
+</main>

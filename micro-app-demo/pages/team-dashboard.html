@@ -1,0 +1,137 @@
+<title>Team Dashboard</title>
+
+<main class="micro-app-shell mx-auto max-w-lg">
+  <div class="space-y-1.5 px-8 pt-8 pb-5">
+    <div class="flex items-center justify-between">
+      <h1 class="micro-app-title">Team Dashboard</h1>
+      <status-badge status="active"></status-badge>
+    </div>
+    <p class="micro-app-subtitle">
+      Same
+      <code
+        class="rounded px-1 py-0.5 font-mono text-xs"
+        style="background: var(--muted)"
+        >&lt;status-badge&gt;</code
+      >,
+      <code
+        class="rounded px-1 py-0.5 font-mono text-xs"
+        style="background: var(--muted)"
+        >&lt;info-card&gt;</code
+      >, and
+      <code
+        class="rounded px-1 py-0.5 font-mono text-xs"
+        style="background: var(--muted)"
+        >&lt;toggle-switch&gt;</code
+      >
+      components — loaded from <strong>shared.js</strong>,
+      zero duplication.
+    </p>
+  </div>
+
+  <hr class="micro-app-divider" style="margin: 0" />
+
+  <!-- Team Members -->
+  <div class="px-8 pt-6 pb-2">
+    <span class="micro-app-label">Team Members</span>
+    <div class="mt-3 space-y-3">
+      <info-card>
+        <strong slot="title">Alice Chen</strong>
+        <status-badge
+          slot="badge"
+          status="active"
+        ></status-badge>
+        <p>
+          Frontend lead. Shipped 12 PRs this sprint with
+          zero regressions.
+        </p>
+        <span slot="footer">Last active: 2 min ago</span>
+      </info-card>
+
+      <info-card>
+        <strong slot="title">Bob Martinez</strong>
+        <status-badge
+          slot="badge"
+          status="pending"
+        ></status-badge>
+        <p>
+          Backend engineer. Currently reviewing the auth
+          refactor PR.
+        </p>
+        <span slot="footer">Last active: 15 min ago</span>
+      </info-card>
+
+      <info-card>
+        <strong slot="title">Carol Park</strong>
+        <status-badge
+          slot="badge"
+          status="inactive"
+        ></status-badge>
+        <p>DevOps. On vacation until next Monday.</p>
+        <span slot="footer">Last active: 2 days ago</span>
+      </info-card>
+    </div>
+  </div>
+
+  <hr class="micro-app-divider" style="margin: 16px 32px" />
+
+  <!-- Team Settings -->
+  <div
+    class="px-8 pt-2 pb-6"
+    x-data="{ standups: true, codeReview: true, deployAlerts: false }"
+  >
+    <span class="micro-app-label">Team Notifications</span>
+    <div class="mt-3 space-y-3">
+      <div
+        class="micro-app-section flex items-center justify-between"
+        style="padding: 12px 16px"
+      >
+        <toggle-switch
+          label="Daily Standups"
+          checked
+          @toggle="standups = $event.detail.checked"
+        ></toggle-switch>
+        <span
+          class="micro-app-subtitle"
+          x-text="standups ? 'On' : 'Off'"
+        ></span>
+      </div>
+
+      <div
+        class="micro-app-section flex items-center justify-between"
+        style="padding: 12px 16px"
+      >
+        <toggle-switch
+          label="Code Review Pings"
+          checked
+          @toggle="codeReview = $event.detail.checked"
+        ></toggle-switch>
+        <span
+          class="micro-app-subtitle"
+          x-text="codeReview ? 'On' : 'Off'"
+        ></span>
+      </div>
+
+      <div
+        class="micro-app-section flex items-center justify-between"
+        style="padding: 12px 16px"
+      >
+        <toggle-switch
+          label="Deploy Alerts"
+          @toggle="deployAlerts = $event.detail.checked"
+        ></toggle-switch>
+        <span
+          class="micro-app-subtitle"
+          x-text="deployAlerts ? 'On' : 'Off'"
+        ></span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="micro-app-divider" style="margin: 0" />
+  <div class="px-8 py-5">
+    <p class="micro-app-subtitle">
+      All three components reused from
+      <strong>shared.js</strong> — no inline scripts needed.
+    </p>
+  </div>
+</main>
