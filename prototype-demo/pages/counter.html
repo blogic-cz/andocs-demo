@@ -2,35 +2,35 @@
 
 <main
   x-data="{ count: 0, step: 1 }"
-  class="micro-app-shell mx-auto max-w-md"
+  class="prototype-shell mx-auto max-w-md"
 >
   <!-- Header -->
   <div class="space-y-1.5 px-8 pt-8 pb-5">
     <div class="flex items-center justify-between">
-      <h1 class="micro-app-title">Counter</h1>
-      <span class="micro-app-badge"
+      <h1 class="prototype-title">Counter</h1>
+      <span class="prototype-badge"
         >Alpine.js + Tailwind</span
       >
     </div>
-    <p class="micro-app-subtitle">
-      Interactive micro-app embedded via
+    <p class="prototype-subtitle">
+      Interactive prototype embedded via
       <code
         class="rounded px-1 py-0.5 font-mono text-xs"
         style="background: var(--muted)"
-        >andocs-app</code
+        >prototype</code
       >
       block with shared.css styling.
     </p>
   </div>
 
-  <hr class="micro-app-divider" style="margin: 0" />
+  <hr class="prototype-divider" style="margin: 0" />
   <!-- Counter display -->
   <div
-    class="micro-app-section mx-8 mt-6"
+    class="prototype-section mx-8 mt-6"
     style="text-align: center; padding: 32px 24px"
   >
-    <span class="micro-app-label">Current value</span>
-    <p class="micro-app-value" x-text="count"></p>
+    <span class="prototype-label">Current value</span>
+    <p class="prototype-value" x-text="count"></p>
   </div>
   <!-- Controls -->
   <div class="space-y-4 px-8 pt-6">
@@ -38,14 +38,14 @@
       <button
         type="button"
         @click="count += step"
-        class="micro-app-btn micro-app-btn-primary"
+        class="prototype-btn prototype-btn-primary"
       >
         Increment
       </button>
       <button
         type="button"
         @click="count = Math.max(0, count - step)"
-        class="micro-app-btn micro-app-btn-secondary"
+        class="prototype-btn prototype-btn-secondary"
       >
         Decrement
       </button>
@@ -53,7 +53,7 @@
     <!-- Step selector -->
     <div class="flex items-center gap-3">
       <span
-        class="micro-app-label"
+        class="prototype-label"
         style="margin-bottom: 0; flex-shrink: 0"
         >Step</span
       >
@@ -62,7 +62,7 @@
           type="button"
           @click="step = 1"
           :data-active="step === 1 ? 'true' : 'false'"
-          class="micro-app-btn micro-app-btn-ghost flex-1"
+          class="prototype-btn prototype-btn-ghost flex-1"
         >
           1
         </button>
@@ -70,7 +70,7 @@
           type="button"
           @click="step = 5"
           :data-active="step === 5 ? 'true' : 'false'"
-          class="micro-app-btn micro-app-btn-ghost flex-1"
+          class="prototype-btn prototype-btn-ghost flex-1"
         >
           5
         </button>
@@ -78,7 +78,7 @@
           type="button"
           @click="step = 10"
           :data-active="step === 10 ? 'true' : 'false'"
-          class="micro-app-btn micro-app-btn-ghost flex-1"
+          class="prototype-btn prototype-btn-ghost flex-1"
         >
           10
         </button>
@@ -86,16 +86,16 @@
     </div>
   </div>
 
-  <hr class="micro-app-divider" style="margin: 20px 32px" />
+  <hr class="prototype-divider" style="margin: 20px 32px" />
   <!-- Footer -->
   <div class="flex items-center justify-between px-8 pb-7">
-    <span class="micro-app-subtitle">
+    <span class="prototype-subtitle">
       Step: <strong x-text="step"></strong>
     </span>
     <button
       type="button"
       @click="count = 0; step = 1"
-      class="micro-app-btn micro-app-btn-ghost"
+      class="prototype-btn prototype-btn-ghost"
       style="font-size: 0.75rem"
     >
       Reset

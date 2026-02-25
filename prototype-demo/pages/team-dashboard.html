@@ -1,12 +1,12 @@
 <title>Team Dashboard</title>
 
-<main class="micro-app-shell mx-auto max-w-lg">
+<main class="prototype-shell mx-auto max-w-lg">
   <div class="space-y-1.5 px-8 pt-8 pb-5">
     <div class="flex items-center justify-between">
-      <h1 class="micro-app-title">Team Dashboard</h1>
+      <h1 class="prototype-title">Team Dashboard</h1>
       <status-badge status="active"></status-badge>
     </div>
-    <p class="micro-app-subtitle">
+    <p class="prototype-subtitle">
       Same
       <code
         class="rounded px-1 py-0.5 font-mono text-xs"
@@ -28,11 +28,11 @@
     </p>
   </div>
 
-  <hr class="micro-app-divider" style="margin: 0" />
+  <hr class="prototype-divider" style="margin: 0" />
 
   <!-- Team Members -->
   <div class="px-8 pt-6 pb-2">
-    <span class="micro-app-label">Team Members</span>
+    <span class="prototype-label">Team Members</span>
     <div class="mt-3 space-y-3">
       <info-card>
         <strong slot="title">Alice Chen</strong>
@@ -72,17 +72,17 @@
     </div>
   </div>
 
-  <hr class="micro-app-divider" style="margin: 16px 32px" />
+  <hr class="prototype-divider" style="margin: 16px 32px" />
 
   <!-- Team Settings -->
   <div
     class="px-8 pt-2 pb-6"
     x-data="{ standups: true, codeReview: true, deployAlerts: false }"
   >
-    <span class="micro-app-label">Team Notifications</span>
+    <span class="prototype-label">Team Notifications</span>
     <div class="mt-3 space-y-3">
       <div
-        class="micro-app-section flex items-center justify-between"
+        class="prototype-section flex items-center justify-between"
         style="padding: 12px 16px"
       >
         <toggle-switch
@@ -91,13 +91,13 @@
           @toggle="standups = $event.detail.checked"
         ></toggle-switch>
         <span
-          class="micro-app-subtitle"
+          class="prototype-subtitle"
           x-text="standups ? 'On' : 'Off'"
         ></span>
       </div>
 
       <div
-        class="micro-app-section flex items-center justify-between"
+        class="prototype-section flex items-center justify-between"
         style="padding: 12px 16px"
       >
         <toggle-switch
@@ -106,13 +106,13 @@
           @toggle="codeReview = $event.detail.checked"
         ></toggle-switch>
         <span
-          class="micro-app-subtitle"
+          class="prototype-subtitle"
           x-text="codeReview ? 'On' : 'Off'"
         ></span>
       </div>
 
       <div
-        class="micro-app-section flex items-center justify-between"
+        class="prototype-section flex items-center justify-between"
         style="padding: 12px 16px"
       >
         <toggle-switch
@@ -120,16 +120,16 @@
           @toggle="deployAlerts = $event.detail.checked"
         ></toggle-switch>
         <span
-          class="micro-app-subtitle"
+          class="prototype-subtitle"
           x-text="deployAlerts ? 'On' : 'Off'"
         ></span>
       </div>
     </div>
   </div>
 
-  <hr class="micro-app-divider" style="margin: 0" />
+  <hr class="prototype-divider" style="margin: 0" />
   <div class="px-8 py-5">
-    <p class="micro-app-subtitle">
+    <p class="prototype-subtitle">
       All three components reused from
       <strong>shared.js</strong> — no inline scripts needed.
     </p>

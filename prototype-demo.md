@@ -1,12 +1,12 @@
-# Micro-App Demo
+# Prototype Demo
 
-This page demonstrates how to embed external HTML micro-apps using the `andocs-app` block. Micro-apps run inside sandboxed iframes with **Tailwind CSS** and **Alpine.js** injected automatically.
+This page demonstrates how to embed external HTML prototypes using the `prototype` block. Prototypes run inside sandboxed iframes with **Tailwind CSS** and **Alpine.js** injected automatically.
 
 ## Demo Structure
 
 ```text
-micro-app-demo/
-  andocs-app.json          # marks this folder as a micro-app root
+prototype-demo/
+  prototype.json          # marks this folder as a prototype root
   shared.css               # smart-default styles (buttons, cards, typography)
   shared.js                # shared Web Component definitions (auto-injected)
   pages/
@@ -20,15 +20,15 @@ micro-app-demo/
 
 A simple counter demonstrating basic Alpine.js reactivity and the smart-default CSS classes.
 
-```andocs-app path=micro-app-demo/pages/counter.html
+```prototype path=prototype-demo/pages/counter.html
 
 ```
 
 ## 2. Client Dashboard (Multi-Page)
 
-A more complex micro-app with **navigation between pages** — click a client row to open the detail view, then navigate back. All powered by Alpine.js state management within a single HTML file.
+A more complex prototype with **navigation between pages** — click a client row to open the detail view, then navigate back. All powered by Alpine.js state management within a single HTML file.
 
-```andocs-app path=micro-app-demo/pages/crm.html
+```prototype path=prototype-demo/pages/crm.html
 
 ```
 
@@ -37,11 +37,11 @@ A more complex micro-app with **navigation between pages** — click a client ro
 
 Native **Custom Elements** with Shadow DOM, slots, and observed attributes — zero build, zero framework.
 
-Component classes are defined **once** in `shared.js` and auto-injected into every page under the same `andocs-app.json` root. No `<script src>` needed — Andocs reads `shared.js` and inlines it as a `<script>` block in `<head>`.
+Component classes are defined **once** in `shared.js` and auto-injected into every page under the same `prototype.json` root. No `<script src>` needed — Andocs reads `shared.js` and inlines it as a `<script>` block in `<head>`.
 
 ### Shared component definitions (`shared.js`)
 
-Three reusable Web Components live in a single file next to `andocs-app.json`:
+Three reusable Web Components live in a single file next to `prototype.json`:
 
 - **`<status-badge status="active">`** — reactive pill with observed attributes
 - **`<info-card>`** — card with named slots (`title`, `badge`, `footer`) + default slot
@@ -68,7 +68,7 @@ customElements.define("status-badge", StatusBadge);
 
 All three components demonstrated with usage examples — badges, slotted cards, and interactive toggles wired to Alpine.js state.
 
-```andocs-app path=micro-app-demo/pages/web-components.html title="Component Showcase" height=800
+```prototype path=prototype-demo/pages/web-components.html title="Component Showcase" height=800
 
 ```
 
@@ -76,12 +76,12 @@ All three components demonstrated with usage examples — badges, slotted cards,
 
 The **same components** reused in a completely different context — team member cards with status badges and notification toggles. Zero code duplication.
 
-```andocs-app path=micro-app-demo/pages/team-dashboard.html title="Team Dashboard" height=800
+```prototype path=prototype-demo/pages/team-dashboard.html title="Team Dashboard" height=800
 
 ```
 
 ## How It Works
 2. **Tailwind CSS** and **Alpine.js** CDNs are injected automatically — no setup needed.
-3. **`shared.css`** is discovered from the nearest parent directory that contains `andocs-app.json`. It provides smart-default utility classes (`micro-app-shell`, `micro-app-btn`, `micro-app-section`, etc.) so micro-apps look polished out of the box.
-4. **`shared.js`** works the same way — place it next to `andocs-app.json` to share Web Component definitions (or any runtime code) across all pages in that micro-app root.
-5. **Andocs design tokens** (`--primary`, `--background`, `--foreground`, `--border`, etc.) are available as CSS custom properties inside the iframe, keeping micro-apps visually consistent with the parent documentation site.
+3. **`shared.css`** is discovered from the nearest parent directory that contains `prototype.json`. It provides smart-default utility classes (`prototype-shell`, `prototype-btn`, `prototype-section`, etc.) so prototypes look polished out of the box.
+4. **`shared.js`** works the same way — place it next to `prototype.json` to share Web Component definitions (or any runtime code) across all pages in that prototype root.
+5. **Andocs design tokens** (`--primary`, `--background`, `--foreground`, `--border`, etc.) are available as CSS custom properties inside the iframe, keeping prototypes visually consistent with the parent documentation site.

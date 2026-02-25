@@ -23,7 +23,7 @@
       return 'background: #dbeafe; color: #1e40af';
     }
   }"
-  class="micro-app-shell"
+  class="prototype-shell"
 >
   <!-- ═══ DASHBOARD PAGE ═══ -->
   <template x-if="page === 'dashboard'">
@@ -32,28 +32,28 @@
       <div class="px-8 pt-8 pb-5">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="micro-app-title">
+            <h1 class="prototype-title">
               Client Dashboard
             </h1>
-            <p class="micro-app-subtitle mt-1">
+            <p class="prototype-subtitle mt-1">
               Manage your client portfolio
             </p>
           </div>
-          <span class="micro-app-badge"
+          <span class="prototype-badge"
             >Multi-page Demo</span
           >
         </div>
       </div>
 
-      <hr class="micro-app-divider" style="margin: 0" />
+      <hr class="prototype-divider" style="margin: 0" />
 
       <!-- Stats row -->
       <div class="grid grid-cols-3 gap-4 px-8 py-6">
         <div
-          class="micro-app-section"
+          class="prototype-section"
           style="text-align: center; padding: 16px"
         >
-          <span class="micro-app-label">Total Revenue</span>
+          <span class="prototype-label">Total Revenue</span>
           <p
             style="
               font-size: 1.5rem;
@@ -65,10 +65,10 @@
           ></p>
         </div>
         <div
-          class="micro-app-section"
+          class="prototype-section"
           style="text-align: center; padding: 16px"
         >
-          <span class="micro-app-label"
+          <span class="prototype-label"
             >Active Clients</span
           >
           <p
@@ -77,10 +77,10 @@
           ></p>
         </div>
         <div
-          class="micro-app-section"
+          class="prototype-section"
           style="text-align: center; padding: 16px"
         >
-          <span class="micro-app-label">Open Deals</span>
+          <span class="prototype-label">Open Deals</span>
           <p
             style="
               font-size: 1.5rem;
@@ -110,27 +110,27 @@
             "
           >
             <span
-              class="micro-app-label col-span-4"
+              class="prototype-label col-span-4"
               style="margin: 0"
               >Client</span
             >
             <span
-              class="micro-app-label col-span-3"
+              class="prototype-label col-span-3"
               style="margin: 0"
               >Contact</span
             >
             <span
-              class="micro-app-label col-span-2"
+              class="prototype-label col-span-2"
               style="margin: 0; text-align: right"
               >Revenue</span
             >
             <span
-              class="micro-app-label col-span-1"
+              class="prototype-label col-span-1"
               style="margin: 0; text-align: center"
               >Deals</span
             >
             <span
-              class="micro-app-label col-span-2"
+              class="prototype-label col-span-2"
               style="margin: 0; text-align: right"
               >Status</span
             >
@@ -164,7 +164,7 @@
               </div>
               <div class="col-span-3">
                 <span
-                  class="micro-app-subtitle"
+                  class="prototype-subtitle"
                   x-text="client.contact"
                 ></span>
               </div>
@@ -195,7 +195,7 @@
               </div>
               <div class="col-span-2 flex justify-end">
                 <span
-                  class="micro-app-badge"
+                  class="prototype-badge"
                   :style="statusColor(client.status)"
                   x-text="client.status"
                 ></span>
@@ -214,7 +214,7 @@
       <div class="px-8 pt-6 pb-5">
         <button
           @click="goBack()"
-          class="micro-app-btn micro-app-btn-ghost mb-3"
+          class="prototype-btn prototype-btn-ghost mb-3"
           style="padding: 4px 8px; font-size: 0.75rem"
         >
           ← Back to Dashboard
@@ -222,31 +222,31 @@
         <div class="flex items-center justify-between">
           <div>
             <h1
-              class="micro-app-title"
+              class="prototype-title"
               x-text="selectedClient.name"
             ></h1>
             <p
-              class="micro-app-subtitle mt-1"
+              class="prototype-subtitle mt-1"
               x-text="selectedClient.email"
             ></p>
           </div>
           <span
-            class="micro-app-badge"
+            class="prototype-badge"
             :style="statusColor(selectedClient.status)"
             x-text="selectedClient.status"
           ></span>
         </div>
       </div>
 
-      <hr class="micro-app-divider" style="margin: 0" />
+      <hr class="prototype-divider" style="margin: 0" />
 
       <!-- Client info cards -->
       <div class="grid grid-cols-2 gap-4 px-8 py-6">
         <div
-          class="micro-app-section"
+          class="prototype-section"
           style="padding: 20px"
         >
-          <span class="micro-app-label"
+          <span class="prototype-label"
             >Primary Contact</span
           >
           <p
@@ -258,15 +258,15 @@
             x-text="selectedClient.contact"
           ></p>
           <p
-            class="micro-app-subtitle"
+            class="prototype-subtitle"
             x-text="selectedClient.email"
           ></p>
         </div>
         <div
-          class="micro-app-section"
+          class="prototype-section"
           style="padding: 20px"
         >
-          <span class="micro-app-label">Last Contact</span>
+          <span class="prototype-label">Last Contact</span>
           <p
             style="
               font-size: 0.9375rem;
@@ -275,7 +275,7 @@
             "
             x-text="selectedClient.lastContact"
           ></p>
-          <p class="micro-app-subtitle">
+          <p class="prototype-subtitle">
             Most recent interaction
           </p>
         </div>
@@ -284,23 +284,23 @@
       <!-- Revenue & deals -->
       <div class="grid grid-cols-2 gap-4 px-8 pb-6">
         <div
-          class="micro-app-section"
+          class="prototype-section"
           style="text-align: center; padding: 24px"
         >
-          <span class="micro-app-label">Total Revenue</span>
+          <span class="prototype-label">Total Revenue</span>
           <p
-            class="micro-app-value"
+            class="prototype-value"
             style="font-size: 2rem; margin-top: 4px"
             x-text="formatCurrency(selectedClient.revenue)"
           ></p>
         </div>
         <div
-          class="micro-app-section"
+          class="prototype-section"
           style="text-align: center; padding: 24px"
         >
-          <span class="micro-app-label">Active Deals</span>
+          <span class="prototype-label">Active Deals</span>
           <p
-            class="micro-app-value"
+            class="prototype-value"
             style="font-size: 2rem; margin-top: 4px"
             x-text="selectedClient.deals"
           ></p>
@@ -308,23 +308,23 @@
       </div>
 
       <hr
-        class="micro-app-divider"
+        class="prototype-divider"
         style="margin: 0 32px"
       />
 
       <!-- Actions -->
       <div class="flex gap-3 px-8 py-6">
         <button
-          class="micro-app-btn micro-app-btn-primary flex-1"
+          class="prototype-btn prototype-btn-primary flex-1"
         >
           Send Email
         </button>
         <button
-          class="micro-app-btn micro-app-btn-secondary flex-1"
+          class="prototype-btn prototype-btn-secondary flex-1"
         >
           Schedule Call
         </button>
-        <button class="micro-app-btn micro-app-btn-ghost">
+        <button class="prototype-btn prototype-btn-ghost">
           Edit
         </button>
       </div>
