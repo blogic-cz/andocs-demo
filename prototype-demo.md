@@ -1,5 +1,15 @@
 # Prototype Demo
 
+> **🛠️ Want to generate prototypes like these with AI?** Install the **andocs** agent skill and let your coding agent create prototypes, HTML previews, diagrams, and documentation automatically.
+>
+> ```bash
+> npx skills add blogic-cz/blogic-marketplace --skill andocs
+> ```
+>
+> The skill works with Claude Code, Cursor, Copilot, Windsurf, and [35+ other agents](https://skills.sh). It teaches your agent the correct `prototype` syntax, `prototype.json` configuration, shared CSS/JS conventions, Web Components patterns, and all Andocs rendering features.
+>
+> 📖 **Skill source & docs:** [blogic-cz/blogic-marketplace](https://github.com/blogic-cz/blogic-marketplace/tree/main/agent-kit/skills/andocs)
+
 This page demonstrates how to embed external HTML prototypes using the `prototype` block. Prototypes run inside sandboxed iframes with **Tailwind CSS** and **Alpine.js** injected automatically.
 
 ## Demo Structure
@@ -85,3 +95,11 @@ The **same components** reused in a completely different context — team member
 3. **`shared.css`** is discovered from the nearest parent directory that contains `prototype.json`. It provides smart-default utility classes (`prototype-shell`, `prototype-btn`, `prototype-section`, etc.) so prototypes look polished out of the box.
 4. **`shared.js`** works the same way — place it next to `prototype.json` to share Web Component definitions (or any runtime code) across all pages in that prototype root.
 5. **Andocs design tokens** (`--primary`, `--background`, `--foreground`, `--border`, etc.) are available as CSS custom properties inside the iframe, keeping prototypes visually consistent with the parent documentation site.
+
+---
+
+> **💡 Tip:** Don't write prototypes manually — use the **andocs** agent skill! Your AI coding agent will generate all of this for you: `prototype.json`, `shared.css`, `shared.js`, multi-page HTML, Web Components, and the correct markdown syntax.
+>
+> ```bash
+> npx skills add blogic-cz/blogic-marketplace --skill andocs
+> ```

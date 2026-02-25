@@ -1,5 +1,15 @@
 # HTML Preview Blocks
 
+> **🛠️ Want your AI agent to generate HTML previews like these?** Install the **andocs** skill:
+>
+> ```bash
+> npx skills add blogic-cz/blogic-marketplace --skill andocs
+> ```
+>
+> The skill teaches your coding agent the correct `html-preview` syntax, auto-resize patterns, and all Andocs rendering features. Works with Claude Code, Cursor, Copilot, Windsurf, and [35+ other agents](https://skills.sh).
+>
+> 📖 **Skill source & docs:** [blogic-cz/blogic-marketplace](https://github.com/blogic-cz/blogic-marketplace/tree/main/agent-kit/skills/andocs)
+
 andocs supports embedding interactive HTML prototypes directly inside markdown documentation using `html-preview` code blocks. This is useful for sharing UI mockups, form prototypes, and interactive demos with your team — without leaving the documentation.
 
 ## How It Works
@@ -885,3 +895,11 @@ Below is a complex, fully interactive fintech loan application form. It demonstr
 - **Auto-resize** — for best results, send a `postMessage` with `{ type: 'html-preview-height', height: ... }` from your script. The preview will auto-adjust its height.
 - **Mobile-friendly** — add `<meta name="viewport" ...>` and responsive CSS if your prototype should work on narrow screens.
 - **Multiple blocks** — you can have multiple `html-preview` blocks in a single document, interleaved with regular markdown.
+
+---
+
+> **💡 Tip:** Instead of writing HTML previews by hand, let your AI coding agent do it. Install the **andocs** agent skill and describe what you want — the agent handles the HTML, CSS, JS, and auto-resize boilerplate.
+>
+> ```bash
+> npx skills add blogic-cz/blogic-marketplace --skill andocs
+> ```
