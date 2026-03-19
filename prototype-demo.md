@@ -90,9 +90,31 @@ The **same components** reused in a completely different context — team member
 
 ```
 
+## 5. CSS Cascade — Inherited Styles
+
+Prototypes support **CSS cascade**: when a sub-prototype has its own `prototype.json`, it inherits `shared.css` from all parent `prototype.json` roots. Base styles load first, then more specific styles override them.
+
+```text
+prototype-demo/
+  prototype.json          # root marker
+  shared.css               # ← base styles (buttons, cards, typography)
+  cascade-demo/
+    prototype.json         # sub-prototype marker
+    shared.css              # ← adds table & badge styles on top
+    pages/
+      import-log.html      # gets BOTH shared.css files!
+```
+
+The page below uses `.prototype-shell`, `.prototype-title`, `.prototype-btn` from the **parent** `shared.css` and `.cascade-table`, `.cascade-badge` from its **own** `shared.css` — no duplication needed.
+
+```prototype path=prototype-demo/cascade-demo/pages/import-log.html title="Import Log (CSS Cascade)" height=500
+
+```
+
 ## How It Works
+1. **CSS cascade**: `shared.css` files are collected from ALL `prototype.json` roots walking up the directory tree. Root styles load first, sub-prototype styles load last — so deeper styles can override base styles. No need to duplicate common styles in every sub-prototype.
 2. **Tailwind CSS** and **Alpine.js** CDNs are injected automatically — no setup needed.
-3. **`shared.css`** is discovered from the nearest parent directory that contains `prototype.json`. It provides smart-default utility classes (`prototype-shell`, `prototype-btn`, `prototype-section`, etc.) so prototypes look polished out of the box.
+3. **`shared.css`** provides smart-default utility classes (`prototype-shell`, `prototype-btn`, `prototype-section`, etc.) so prototypes look polished out of the box.
 4. **`shared.js`** works the same way — place it next to `prototype.json` to share Web Component definitions (or any runtime code) across all pages in that prototype root.
 5. **Andocs design tokens** (`--primary`, `--background`, `--foreground`, `--border`, etc.) are available as CSS custom properties inside the iframe, keeping prototypes visually consistent with the parent documentation site.
 

@@ -1,0 +1,56 @@
+<title>Import Log — CSS Cascade Demo</title>
+
+<div class="prototype-shell">
+  <div class="px-8 pt-8 pb-7">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="prototype-title">Import Log</h2>
+        <p class="prototype-subtitle mt-1">CSS Cascade Demo — this page inherits base styles from the parent <code>shared.css</code> and adds table/badge styles from its own <code>shared.css</code></p>
+      </div>
+      <button class="prototype-btn prototype-btn-primary" x-data x-on:click="$el.textContent = 'Synced!'">
+        Sync Now
+      </button>
+    </div>
+
+    <div class="mt-6" x-data="{
+      imports: [
+        { id: 'IMP-001', source: 'SAP ERP', records: 1247, status: 'success', time: '2.3s' },
+        { id: 'IMP-002', source: 'Salesforce', records: 892, status: 'success', time: '1.8s' },
+        { id: 'IMP-003', source: 'Legacy DB', records: 0, status: 'error', time: '12.1s' },
+        { id: 'IMP-004', source: 'CSV Upload', records: 56, status: 'warning', time: '0.4s' },
+        { id: 'IMP-005', source: 'REST API', records: 3401, status: 'success', time: '5.7s' },
+      ]
+    }">
+      <table class="cascade-table">
+        <thead>
+          <tr>
+            <th>Import ID</th>
+            <th>Source</th>
+            <th>Records</th>
+            <th>Status</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="imp in imports" :key="imp.id">
+            <tr>
+              <td class="font-mono text-xs" x-text="imp.id"></td>
+              <td x-text="imp.source"></td>
+              <td class="font-mono" x-text="imp.records.toLocaleString()"></td>
+              <td>
+                <span class="cascade-badge"
+                  :class="{
+                    'cascade-badge-success': imp.status === 'success',
+                    'cascade-badge-warning': imp.status === 'warning',
+                    'cascade-badge-error': imp.status === 'error',
+                  }"
+                  x-text="imp.status"></span>
+              </td>
+              <td class="font-mono text-xs" x-text="imp.time"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

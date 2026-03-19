@@ -1,0 +1,55 @@
+.cascade-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.cascade-badge-success {
+  background: oklch(0.92 0.1 145);
+  color: oklch(0.35 0.15 145);
+}
+
+.cascade-badge-warning {
+  background: oklch(0.92 0.1 85);
+  color: oklch(0.4 0.15 85);
+}
+
+.cascade-badge-error {
+  background: oklch(0.92 0.12 25);
+  color: oklch(0.4 0.15 25);
+}
+
+.cascade-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.cascade-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  border-bottom: 2px solid var(--border);
+}
+
+.cascade-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.cascade-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cascade-table tr:hover td {
+  background: var(--accent);
+}
