@@ -1,74 +1,295 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_2" targetNamespace="http://bpmn.io/schema/bpmn">
-  <bpmn:process id="OrderApproval" isExecutable="false">
-    <bpmn:startEvent id="StartEvent_Order" name="Order created">
-      <bpmn:outgoing>Flow_A</bpmn:outgoing>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Fintech" targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="FintechPayoutReview" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Customer" name="Customer App">
+        <bpmn:flowNodeRef>StartEvent_Payout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SubmitPayout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Completed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Rejected</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Risk" name="Risk Engine">
+        <bpmn:flowNodeRef>Task_DeviceScreening</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_LimitsCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_RiskDecision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CalculateReserve</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Compliance" name="Compliance Ops">
+        <bpmn:flowNodeRef>Task_SanctionsScreening</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ComplianceJoin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ManualReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ManualDecision</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Treasury" name="Treasury &amp; Banking Partner">
+        <bpmn:flowNodeRef>Gateway_ReadyToSettle</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_BookLiquidity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SendPartnerInstruction</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_WaitSettlementAck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_NotifyCustomer</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="StartEvent_Payout" name="Payout requested">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:userTask id="Task_Check" name="Check order">
-      <bpmn:incoming>Flow_A</bpmn:incoming>
-      <bpmn:outgoing>Flow_B</bpmn:outgoing>
+
+    <bpmn:userTask id="Task_SubmitPayout" name="Submit payout request">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:exclusiveGateway id="Gateway_Approved" name="Approved?">
-      <bpmn:incoming>Flow_B</bpmn:incoming>
-      <bpmn:outgoing>Flow_C</bpmn:outgoing>
-      <bpmn:outgoing>Flow_D</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="Task_Ship" name="Ship package">
-      <bpmn:incoming>Flow_C</bpmn:incoming>
-      <bpmn:outgoing>Flow_E</bpmn:outgoing>
+
+    <bpmn:serviceTask id="Task_DeviceScreening" name="Check device fingerprint">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:endEvent id="EndEvent_Shipped" name="Shipped">
-      <bpmn:incoming>Flow_E</bpmn:incoming>
+
+    <bpmn:serviceTask id="Task_LimitsCheck" name="Evaluate velocity and payout limits">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:serviceTask id="Task_SanctionsScreening" name="Run sanctions and name screening">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:parallelGateway id="Gateway_ComplianceJoin" name="Risk + sanctions ready">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <bpmn:exclusiveGateway id="Gateway_RiskDecision" name="Risk score high?">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="Task_CalculateReserve" name="Calculate reserve and prefund need">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="Gateway_ReadyToSettle" name="Manual review required?">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_ManualReview" name="Investigate suspicious payout">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_ManualDecision" name="Approve manually?">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:serviceTask id="Task_BookLiquidity" name="Reserve treasury liquidity">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:sendTask id="Task_SendPartnerInstruction" name="Send payout to banking partner">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:intermediateCatchEvent id="Event_WaitSettlementAck" name="Wait for settlement ack">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+      <bpmn:outgoing>Flow_18</bpmn:outgoing>
+      <bpmn:timerEventDefinition />
+    </bpmn:intermediateCatchEvent>
+
+    <bpmn:serviceTask id="Task_NotifyCustomer" name="Notify customer and ledger update">
+      <bpmn:incoming>Flow_18</bpmn:incoming>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="EndEvent_Completed" name="Payout completed">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:endEvent id="EndEvent_Cancelled" name="Cancelled">
-      <bpmn:incoming>Flow_D</bpmn:incoming>
+
+    <bpmn:endEvent id="EndEvent_Rejected" name="Payout rejected">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:incoming>Flow_15</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_A" sourceRef="StartEvent_Order" targetRef="Task_Check" />
-    <bpmn:sequenceFlow id="Flow_B" sourceRef="Task_Check" targetRef="Gateway_Approved" />
-    <bpmn:sequenceFlow id="Flow_C" name="Yes" sourceRef="Gateway_Approved" targetRef="Task_Ship" />
-    <bpmn:sequenceFlow id="Flow_D" name="No" sourceRef="Gateway_Approved" targetRef="EndEvent_Cancelled" />
-    <bpmn:sequenceFlow id="Flow_E" sourceRef="Task_Ship" targetRef="EndEvent_Shipped" />
+
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_Payout" targetRef="Task_SubmitPayout" />
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_SubmitPayout" targetRef="Task_DeviceScreening" />
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_DeviceScreening" targetRef="Task_LimitsCheck" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_LimitsCheck" targetRef="Task_SanctionsScreening" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_SanctionsScreening" targetRef="Gateway_ComplianceJoin" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_LimitsCheck" targetRef="Gateway_RiskDecision" />
+    <bpmn:sequenceFlow id="Flow_7" name="Low/medium risk" sourceRef="Gateway_RiskDecision" targetRef="Gateway_ComplianceJoin" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Gateway_ComplianceJoin" targetRef="Task_CalculateReserve" />
+    <bpmn:sequenceFlow id="Flow_9" name="High risk reject" sourceRef="Gateway_RiskDecision" targetRef="EndEvent_Rejected" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_CalculateReserve" targetRef="Gateway_ReadyToSettle" />
+    <bpmn:sequenceFlow id="Flow_11" name="Yes" sourceRef="Gateway_ReadyToSettle" targetRef="Task_ManualReview" />
+    <bpmn:sequenceFlow id="Flow_12" name="No" sourceRef="Gateway_ReadyToSettle" targetRef="Task_BookLiquidity" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_ManualReview" targetRef="Gateway_ManualDecision" />
+    <bpmn:sequenceFlow id="Flow_14" name="Approved" sourceRef="Gateway_ManualDecision" targetRef="Task_BookLiquidity" />
+    <bpmn:sequenceFlow id="Flow_15" name="Declined" sourceRef="Gateway_ManualDecision" targetRef="EndEvent_Rejected" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_BookLiquidity" targetRef="Task_SendPartnerInstruction" />
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="Task_SendPartnerInstruction" targetRef="Event_WaitSettlementAck" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Event_WaitSettlementAck" targetRef="Task_NotifyCustomer" />
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Task_NotifyCustomer" targetRef="EndEvent_Completed" />
   </bpmn:process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_2">
-    <bpmndi:BPMNPlane id="BPMNPlane_2" bpmnElement="OrderApproval">
-      <bpmndi:BPMNShape id="StartEvent_Order_di" bpmnElement="StartEvent_Order">
-        <dc:Bounds x="120" y="120" width="36" height="36" />
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Fintech">
+    <bpmndi:BPMNPlane id="BPMNPlane_Fintech" bpmnElement="FintechPayoutReview">
+      <bpmndi:BPMNShape id="Lane_Customer_di" bpmnElement="Lane_Customer" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="1640" height="140" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_Check_di" bpmnElement="Task_Check">
-        <dc:Bounds x="220" y="98" width="100" height="80" />
+      <bpmndi:BPMNShape id="Lane_Risk_di" bpmnElement="Lane_Risk" isHorizontal="true">
+        <dc:Bounds x="120" y="220" width="1640" height="150" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_Approved_di" bpmnElement="Gateway_Approved" isMarkerVisible="true">
-        <dc:Bounds x="370" y="113" width="50" height="50" />
+      <bpmndi:BPMNShape id="Lane_Compliance_di" bpmnElement="Lane_Compliance" isHorizontal="true">
+        <dc:Bounds x="120" y="370" width="1640" height="170" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_Ship_di" bpmnElement="Task_Ship">
-        <dc:Bounds x="470" y="98" width="100" height="80" />
+      <bpmndi:BPMNShape id="Lane_Treasury_di" bpmnElement="Lane_Treasury" isHorizontal="true">
+        <dc:Bounds x="120" y="540" width="1640" height="180" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_Shipped_di" bpmnElement="EndEvent_Shipped">
-        <dc:Bounds x="640" y="120" width="36" height="36" />
+
+      <bpmndi:BPMNShape id="StartEvent_Payout_di" bpmnElement="StartEvent_Payout">
+        <dc:Bounds x="170" y="132" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_Cancelled_di" bpmnElement="EndEvent_Cancelled">
-        <dc:Bounds x="480" y="230" width="36" height="36" />
+      <bpmndi:BPMNShape id="Task_SubmitPayout_di" bpmnElement="Task_SubmitPayout">
+        <dc:Bounds x="250" y="110" width="120" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_A_di" bpmnElement="Flow_A">
-        <di:waypoint x="156" y="138" />
-        <di:waypoint x="220" y="138" />
+      <bpmndi:BPMNShape id="Task_DeviceScreening_di" bpmnElement="Task_DeviceScreening">
+        <dc:Bounds x="430" y="255" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_LimitsCheck_di" bpmnElement="Task_LimitsCheck">
+        <dc:Bounds x="620" y="255" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SanctionsScreening_di" bpmnElement="Task_SanctionsScreening">
+        <dc:Bounds x="860" y="415" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_RiskDecision_di" bpmnElement="Gateway_RiskDecision" isMarkerVisible="true">
+        <dc:Bounds x="845" y="270" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ComplianceJoin_di" bpmnElement="Gateway_ComplianceJoin" isMarkerVisible="true">
+        <dc:Bounds x="1070" y="430" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CalculateReserve_di" bpmnElement="Task_CalculateReserve">
+        <dc:Bounds x="1170" y="255" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ReadyToSettle_di" bpmnElement="Gateway_ReadyToSettle" isMarkerVisible="true">
+        <dc:Bounds x="1390" y="605" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ManualReview_di" bpmnElement="Task_ManualReview">
+        <dc:Bounds x="1490" y="405" width="160" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ManualDecision_di" bpmnElement="Gateway_ManualDecision" isMarkerVisible="true">
+        <dc:Bounds x="1700" y="425" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_BookLiquidity_di" bpmnElement="Task_BookLiquidity">
+        <dc:Bounds x="1500" y="590" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendPartnerInstruction_di" bpmnElement="Task_SendPartnerInstruction">
+        <dc:Bounds x="1710" y="590" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_WaitSettlementAck_di" bpmnElement="Event_WaitSettlementAck">
+        <dc:Bounds x="1935" y="612" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyCustomer_di" bpmnElement="Task_NotifyCustomer">
+        <dc:Bounds x="2030" y="590" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Completed_di" bpmnElement="EndEvent_Completed">
+        <dc:Bounds x="2260" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Rejected_di" bpmnElement="EndEvent_Rejected">
+        <dc:Bounds x="1940" y="442" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="206" y="150" />
+        <di:waypoint x="250" y="150" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_B_di" bpmnElement="Flow_B">
-        <di:waypoint x="320" y="138" />
-        <di:waypoint x="370" y="138" />
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="370" y="150" />
+        <di:waypoint x="430" y="150" />
+        <di:waypoint x="430" y="295" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_C_di" bpmnElement="Flow_C">
-        <di:waypoint x="420" y="138" />
-        <di:waypoint x="470" y="138" />
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="560" y="295" />
+        <di:waypoint x="620" y="295" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_D_di" bpmnElement="Flow_D">
-        <di:waypoint x="395" y="163" />
-        <di:waypoint x="395" y="248" />
-        <di:waypoint x="480" y="248" />
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="770" y="295" />
+        <di:waypoint x="860" y="295" />
+        <di:waypoint x="860" y="455" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_E_di" bpmnElement="Flow_E">
-        <di:waypoint x="570" y="138" />
-        <di:waypoint x="640" y="138" />
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="1010" y="455" />
+        <di:waypoint x="1070" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="770" y="295" />
+        <di:waypoint x="845" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="895" y="295" />
+        <di:waypoint x="1095" y="295" />
+        <di:waypoint x="1095" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="1120" y="455" />
+        <di:waypoint x="1250" y="455" />
+        <di:waypoint x="1250" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="870" y="320" />
+        <di:waypoint x="870" y="460" />
+        <di:waypoint x="1940" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="1330" y="295" />
+        <di:waypoint x="1415" y="295" />
+        <di:waypoint x="1415" y="605" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="1415" y="605" />
+        <di:waypoint x="1415" y="450" />
+        <di:waypoint x="1490" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="1440" y="630" />
+        <di:waypoint x="1500" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1650" y="450" />
+        <di:waypoint x="1700" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="1725" y="475" />
+        <di:waypoint x="1725" y="630" />
+        <di:waypoint x="1660" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="1750" y="450" />
+        <di:waypoint x="1940" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="1660" y="630" />
+        <di:waypoint x="1710" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="1880" y="630" />
+        <di:waypoint x="1935" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18_di" bpmnElement="Flow_18">
+        <di:waypoint x="1971" y="630" />
+        <di:waypoint x="2030" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <di:waypoint x="2200" y="630" />
+        <di:waypoint x="2278" y="630" />
+        <di:waypoint x="2278" y="168" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

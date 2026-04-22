@@ -84,5 +84,7 @@ Andocs can render BPMN diagrams from embedded `bpmn` blocks and from referenced 
 
 ## Referenced BPMN file
 
+The referenced example is a more complex fintech payout review flow with swimlanes for the customer app, risk engine, compliance operations, and treasury / banking partner settlement.
+
 ```bpmn path=bpmn-demo/order-approval.bpmn
 ```
