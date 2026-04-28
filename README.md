@@ -24,6 +24,7 @@ This folder contains demo documentation showcasing what Andocs can render. Use t
 | [HTML Preview](html-preview-demo.md)    | Interactive HTML prototypes in sandboxed iframes       |
 | [Prototype Demo](prototype-demo.md)     | External HTML prototypes via `prototype` blocks        |
 | [BPMN Diagrams](bpmn-diagrams.md)       | Embedded and referenced BPMN diagrams                  |
+| [Local Images](local-images.md)         | Relative image paths from local folders                |
 | [Nested Link Repro](nested-link-repro/guide-one.md) | Generic nested markdown link reproduction               |
 
 ## How to use
