@@ -9,13 +9,14 @@ listing many generated outputs.
 
 | Report                                                | What it shows                          |
 | ----------------------------------------------------- | -------------------------------------- |
-| [Quarterly Summary](html-outputs/reports/quarterly-summary.html) | Volume and handling-time comparison     |
-| [Data Quality Check](html-outputs/reports/data-quality-check.html) | Validation results with a live filter |
+| [Quarterly Summary](./html-outputs/reports/quarterly-summary.html) | Volume and handling-time comparison     |
+| [Data Quality Check](./html-outputs/reports/data-quality-check.html) | Validation results with a live filter |
 
 ## How it works
 
 1. Put the HTML files anywhere under a folder marked with `prototype.json`.
-2. Link them from markdown with a normal relative link — `[Report](html-outputs/reports/quarterly-summary.html)`.
+2. Link them from markdown with a normal relative link — `[Report](./html-outputs/reports/quarterly-summary.html)`.
+   Relative (`./`, `../`, bare) and repo-root (`/…`) paths all work, exactly like `.md` links.
 3. Clicking the link opens `/app/<org>/<project>/<repo>/html-outputs/reports/quarterly-summary.html`
    directly. That URL is shareable — anyone with access to the project opens the same page.
 
