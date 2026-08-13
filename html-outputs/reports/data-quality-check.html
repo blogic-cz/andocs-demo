@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Data Quality Check</title>
+  </head>
+  <body>
+    <div class="prototype-shell" x-data="{ onlyFailed: false }">
+      <h1 class="prototype-title">Data Quality Check</h1>
+      <p class="prototype-subtitle">
+        Generated report — sample data, no real figures.
+      </p>
+
+      <label class="filter-row">
+        <input type="checkbox" x-model="onlyFailed" />
+        Show failed checks only
+      </label>
+
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Check</th>
+            <th>Records</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr x-show="!onlyFailed">
+            <td>Mandatory fields present</td>
+            <td>18 402</td>
+            <td class="positive">Passed</td>
+          </tr>
+          <tr>
+            <td>Duplicate identifiers</td>
+            <td>37</td>
+            <td class="negative">Failed</td>
+          </tr>
+          <tr x-show="!onlyFailed">
+            <td>Date ranges valid</td>
+            <td>18 402</td>
+            <td class="positive">Passed</td>
+          </tr>
+          <tr>
+            <td>Unknown category codes</td>
+            <td>112</td>
+            <td class="negative">Failed</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

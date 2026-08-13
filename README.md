@@ -23,6 +23,7 @@ This folder contains demo documentation showcasing what Andocs can render. Use t
 | [Tables and Lists](tables-and-lists.md) | Markdown tables, task lists, nested lists              |
 | [HTML Preview](html-preview-demo.md)    | Interactive HTML prototypes in sandboxed iframes       |
 | [Prototype Demo](prototype-demo.md)     | External HTML prototypes via `prototype` blocks        |
+| [HTML Outputs](html-outputs.md)         | Direct links opening HTML files as standalone pages    |
 | [BPMN Diagrams](bpmn-diagrams.md)       | Embedded and referenced BPMN diagrams                  |
 | [Local Images](local-images.md)         | Relative image paths from local folders                |
 | [Nested Link Repro](nested-link-repro/guide-one.md) | Generic nested markdown link reproduction               |
