@@ -83,3 +83,7 @@ bun run dev
 ## Inline Code
 
 Use single backticks for inline code: `const x = 42;`. Inline code gets a subtle background highlight to stand out from surrounding text.
+
+## Živý test webhooku
+
+Tento odstavec pribudol pushom o 06:13:22 UTC. Ak ho vidíš bez toho, aby si stránku obnovil, webhook aj polling fungujú.
