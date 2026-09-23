@@ -1,0 +1,280 @@
+<title>Stateful Client Database</title>
+
+<style>
+  .database { max-width: 1120px; margin: 0 auto; }
+  .database-header, .database-toolbar, .client-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .database-header { padding: 28px 32px 20px; }
+  .database-toolbar { padding: 16px 32px; }
+  .database-body { display: grid; grid-template-columns: minmax(230px, 0.8fr) minmax(0, 2fr); gap: 20px; padding: 0 32px 32px; }
+  .client-form { display: grid; gap: 14px; align-content: start; }
+  .client-form label { display: grid; gap: 5px; font-size: 0.8125rem; font-weight: 600; }
+  .client-form input, .client-form select, .client-form textarea { width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--background); color: var(--foreground); font: inherit; }
+  .client-form input:focus-visible, .client-form select:focus-visible, .client-form textarea:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+  .client-form textarea { min-height: 82px; resize: vertical; }
+  .client-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  .client-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8125rem; }
+  .client-table th, .client-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .client-table th { background: var(--muted); color: var(--muted-foreground); font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  .client-table tr:last-child td { border-bottom: 0; }
+  .client-table .name { font-weight: 650; }
+  .client-table .notes { display: block; max-width: 220px; margin-top: 3px; color: var(--muted-foreground); font-size: 0.75rem; }
+  .client-actions { justify-content: flex-start; }
+  .client-actions button { padding: 4px 7px; font-size: 0.75rem; }
+  .save-state { min-height: 1.5em; padding: 0 32px 12px; color: var(--muted-foreground); font-size: 0.8125rem; }
+  .save-state[data-kind="warning"], .save-state[data-kind="error"] { color: #a33b20; }
+  .save-state[data-kind="success"] { color: #187347; }
+  .database fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+  .database fieldset:disabled { opacity: 0.65; }
+  @media (max-width: 720px) {
+    body { padding: 12px; }
+    .database-header, .database-toolbar { padding-right: 18px; padding-left: 18px; }
+    .database-body { grid-template-columns: 1fr; padding: 0 18px 20px; }
+    .save-state { padding-right: 18px; padding-left: 18px; }
+  }
+</style>
+
+<main class="prototype-shell database" aria-busy="true">
+  <header class="database-header">
+    <div>
+      <h1 class="prototype-title">Client database</h1>
+      <p class="prototype-subtitle mt-1">A browser-only CRUD demo with explicit save</p>
+    </div>
+    <span class="prototype-badge">Stateful prototype</span>
+  </header>
+  <hr class="prototype-divider" style="margin: 0" />
+
+  <p id="save-state" class="save-state" role="status" aria-live="polite">Loading saved client data…</p>
+
+  <fieldset id="controls" disabled>
+    <div class="database-toolbar">
+      <span class="prototype-subtitle">Changes stay in this page until you save.</span>
+      <div class="client-actions">
+        <button id="reset-button" type="button" class="prototype-btn prototype-btn-secondary">Reset sample data</button>
+        <button id="save-button" type="button" class="prototype-btn prototype-btn-primary" disabled>Save</button>
+      </div>
+    </div>
+
+    <div class="database-body">
+      <form id="client-form" class="prototype-section client-form">
+        <h2 id="form-title" class="prototype-title" style="font-size: 1rem">Add a client</h2>
+        <label>Name <input name="name" autocomplete="name" maxlength="80" required /></label>
+        <label>Company <input name="company" maxlength="100" required /></label>
+        <label>Email <input name="email" type="email" autocomplete="email" maxlength="254" required /></label>
+        <label>Status
+          <select name="status">
+            <option value="prospect">Prospect</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+        <label>Notes <textarea name="notes" maxlength="300"></textarea></label>
+        <div class="client-actions">
+          <button id="submit-button" type="submit" class="prototype-btn prototype-btn-primary">Add client</button>
+          <button id="cancel-button" type="button" class="prototype-btn prototype-btn-ghost" hidden>Cancel edit</button>
+        </div>
+      </form>
+
+      <section aria-label="Saved client records">
+        <div class="client-table-wrap">
+          <table class="client-table">
+            <thead><tr><th>Name</th><th>Company</th><th>Email</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+            <tbody id="client-rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </fieldset>
+</main>
+
+<script>
+  (() => {
+    const sampleClients = [
+      { id: "sample-1", name: "Maya Chen", company: "Northstar Coffee", email: "maya@northstar.example", status: "active", notes: "Quarterly check-in" },
+      { id: "sample-2", name: "Leo Martin", company: "Elmwood Bikes", email: "leo@elmwood.example", status: "prospect", notes: "Send the product overview" },
+      { id: "sample-3", name: "Ari Patel", company: "Aster Labs", email: "ari@aster.example", status: "inactive", notes: "Revisit next season" },
+    ];
+    const state = window.andocsState;
+    const canPersist = Boolean(state && typeof state.load === "function" && typeof state.save === "function");
+    const root = document.querySelector(".database");
+    const controls = document.querySelector("#controls");
+    const form = document.querySelector("#client-form");
+    const rows = document.querySelector("#client-rows");
+    const saveButton = document.querySelector("#save-button");
+    const resetButton = document.querySelector("#reset-button");
+    const cancelButton = document.querySelector("#cancel-button");
+    const statusMessage = document.querySelector("#save-state");
+    let clients = sampleClients.map((client) => ({ ...client }));
+    let editingId = null;
+    let dirty = false;
+    let saving = false;
+    let idSequence = 0;
+
+    function setMessage(message, kind = "") {
+      statusMessage.textContent = message;
+      statusMessage.dataset.kind = kind;
+    }
+
+    function isClientList(value) {
+      if (!Array.isArray(value)) return false;
+      const ids = new Set();
+      return value.every((client) => {
+        if (!client || typeof client !== "object" || Array.isArray(client)) return false;
+        const valid = ["id", "name", "company", "email", "status", "notes"].every((key) => typeof client[key] === "string")
+          && client.name.trim() !== ""
+          && client.company.trim() !== ""
+          && ["prospect", "active", "inactive"].includes(client.status)
+          && !ids.has(client.id);
+        if (valid) ids.add(client.id);
+        return valid;
+      });
+    }
+
+    function markChanged(message = "Unsaved changes. Click Save to keep them after refresh.") {
+      dirty = true;
+      saveButton.disabled = !canPersist || saving;
+      setMessage(canPersist ? message : "Preview only: the Andocs state bridge is unavailable, so changes will reset when this page refreshes.", canPersist ? "warning" : "");
+    }
+
+    function addCell(row, value, className = "") {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      if (className) cell.className = className;
+      row.append(cell);
+      return cell;
+    }
+
+    function render() {
+      rows.replaceChildren();
+      if (!clients.length) {
+        const row = document.createElement("tr");
+        const cell = addCell(row, "No clients yet. Add one with the form.");
+        cell.colSpan = 5;
+        rows.append(row);
+      }
+      for (const client of clients) {
+        const row = document.createElement("tr");
+        const nameCell = addCell(row, client.name, "name");
+        if (client.notes) {
+          const note = document.createElement("span");
+          note.className = "notes";
+          note.textContent = client.notes;
+          nameCell.append(note);
+        }
+        addCell(row, client.company);
+        addCell(row, client.email);
+        addCell(row, client.status[0].toUpperCase() + client.status.slice(1));
+        const actions = document.createElement("td");
+        const actionGroup = document.createElement("div");
+        actionGroup.className = "client-actions";
+        for (const [label, action] of [["Edit", () => beginEdit(client)], ["Delete", () => removeClient(client)]]) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "prototype-btn prototype-btn-ghost";
+          button.textContent = label;
+          button.setAttribute("aria-label", `${label} ${client.name}`);
+          button.addEventListener("click", action);
+          actionGroup.append(button);
+        }
+        actions.append(actionGroup);
+        row.append(actions);
+        rows.append(row);
+      }
+    }
+
+    function clearForm() {
+      form.reset();
+      editingId = null;
+      document.querySelector("#form-title").textContent = "Add a client";
+      document.querySelector("#submit-button").textContent = "Add client";
+      cancelButton.hidden = true;
+    }
+
+    function beginEdit(client) {
+      editingId = client.id;
+      for (const key of ["name", "company", "email", "status", "notes"]) form.elements[key].value = client[key];
+      document.querySelector("#form-title").textContent = "Edit client";
+      document.querySelector("#submit-button").textContent = "Update client";
+      cancelButton.hidden = false;
+      form.elements.name.focus();
+    }
+
+    function removeClient(client) {
+      clients = clients.filter((item) => item.id !== client.id);
+      if (editingId === client.id) clearForm();
+      render();
+      markChanged();
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const values = Object.fromEntries(new FormData(form));
+      const client = {
+        id: editingId ?? `client-${Date.now()}-${++idSequence}`,
+        name: values.name.trim(),
+        company: values.company.trim(),
+        email: values.email.trim(),
+        status: values.status,
+        notes: values.notes.trim(),
+      };
+      if (editingId) clients = clients.map((item) => item.id === editingId ? client : item);
+      else clients = [client, ...clients];
+      clearForm();
+      render();
+      markChanged();
+    });
+
+    cancelButton.addEventListener("click", clearForm);
+
+    resetButton.addEventListener("click", () => {
+      clients = sampleClients.map((client) => ({ ...client }));
+      clearForm();
+      render();
+      markChanged("Sample records restored in this page. Click Save to persist the reset.");
+    });
+
+    saveButton.addEventListener("click", async () => {
+      if (!canPersist || !dirty || saving) return;
+      saving = true;
+      controls.disabled = true;
+      setMessage("Saving client data…");
+      try {
+        const value = { version: 1, clients: clients.map((client) => ({ ...client })) };
+        await state.save(value);
+        dirty = false;
+        setMessage("Saved in this browser for this Andocs user, project, repository, and prototype.", "success");
+      } catch (error) {
+        setMessage(`Save failed. Your edits are still on this page; try again. ${error?.message ?? ""}`.trim(), "error");
+      } finally {
+        saving = false;
+        controls.disabled = false;
+        saveButton.disabled = !canPersist || !dirty;
+      }
+    });
+
+    async function initialize() {
+      try {
+        if (!canPersist) {
+          setMessage("Preview only: the Andocs state bridge is unavailable. Changes work here but reset when you refresh.", "warning");
+        } else {
+          const stored = await state.load();
+          if (stored === null) {
+            setMessage("Sample records loaded. Changes stay on this page until you save.");
+          } else if (stored?.version === 1 && isClientList(stored.clients)) {
+            clients = stored.clients.map((client) => ({ ...client }));
+            setMessage("Your saved client records have been restored.", "success");
+          } else {
+            setMessage("Saved data was not a recognized client list. Sample records are shown; reset or edit them, then save to replace it.", "error");
+          }
+        }
+      } catch (error) {
+        setMessage(`Could not load saved data. Sample records are shown; your existing save was not changed. ${error?.message ?? ""}`.trim(), "error");
+      } finally {
+        render();
+        controls.disabled = false;
+        root.setAttribute("aria-busy", "false");
+      }
+    }
+
+    initialize();
+  })();
+</script>
