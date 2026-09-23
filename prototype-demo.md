@@ -22,6 +22,7 @@ prototype-demo/
   pages/
     counter.html           # simple interactive counter
     crm.html               # multi-page CRM dashboard with client detail
+    stateful-clients.html  # CRUD demo using the Andocs state bridge
     web-components.html    # Web Components showcase
     team-dashboard.html    # reuses same components in a different layout
 ```
@@ -43,7 +44,28 @@ A more complex prototype with **navigation between pages** — click a client ro
 ```
 
 
-## 3. Web Components & Shared Scripts
+## 3. Stateful Client Database
+
+Add, edit, and delete client records, then choose **Save** to keep the JSON data after a refresh. The page loads the saved value first and uses three sample clients only when no value exists. **Reset sample data** replaces the list in the page; choose **Save** afterward to persist that reset.
+
+```prototype path=prototype-demo/pages/stateful-clients.html title="Stateful Client Database" height=800
+
+```
+
+In an Andocs prototype, `window.andocsState.load()` returns a promise for the saved JSON value (or `null`), and `window.andocsState.save(value)` writes a JSON value. Andocs keeps this browser-local state separate for each authenticated user, project, repository, and prototype path. It does not call an application API or sync data to a server. In a preview without the bridge, CRUD still works for the current page, but changes are lost on refresh and the page explains why.
+
+The page loads once during startup and saves only after the user clicks **Save**:
+
+```js
+const saved = await window.andocsState.load();
+if (saved !== null) clients = saved.clients;
+
+await window.andocsState.save({ version: 1, clients });
+```
+
+The sample validates the loaded record shape before restoring it. If loading or saving fails, it keeps the page usable and shows an error; failed saves leave the current edits in the page so they can be retried. To return to the original examples, choose **Reset sample data**, then **Save**.
+
+## 4. Web Components & Shared Scripts
 
 Native **Custom Elements** with Shadow DOM, slots, and observed attributes — zero build, zero framework.
 
