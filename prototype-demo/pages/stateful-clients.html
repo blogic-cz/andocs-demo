@@ -69,7 +69,7 @@
         </label>
         <label>Notes <textarea name="notes" maxlength="300"></textarea></label>
         <div class="client-actions">
-          <button id="submit-button" type="submit" class="prototype-btn prototype-btn-primary">Add client</button>
+          <button id="submit-button" type="button" class="prototype-btn prototype-btn-primary">Add client</button>
           <button id="cancel-button" type="button" class="prototype-btn prototype-btn-ghost" hidden>Cancel edit</button>
         </div>
       </form>
@@ -205,8 +205,12 @@
       markChanged();
     }
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
+    function addOrUpdateClient() {
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        setMessage("Enter a name, company, and valid email.", "error");
+        return;
+      }
       const values = Object.fromEntries(new FormData(form));
       const client = {
         id: editingId ?? `client-${Date.now()}-${++idSequence}`,
@@ -221,7 +225,9 @@
       clearForm();
       render();
       markChanged();
-    });
+    }
+
+    document.querySelector("#submit-button").addEventListener("click", addOrUpdateClient);
 
     cancelButton.addEventListener("click", clearForm);
 
