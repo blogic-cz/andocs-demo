@@ -23,6 +23,7 @@
   .save-state { min-height: 1.5em; padding: 0 32px 12px; color: var(--muted-foreground); font-size: 0.8125rem; }
   .save-state[data-kind="warning"], .save-state[data-kind="error"] { color: #a33b20; }
   .save-state[data-kind="success"] { color: #187347; }
+  .database [hidden] { display: none; }
   .database fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
   .database fieldset:disabled { opacity: 0.65; }
   @media (max-width: 720px) {
@@ -37,7 +38,7 @@
   <header class="database-header">
     <div>
       <h1 class="prototype-title">Client database</h1>
-      <p class="prototype-subtitle mt-1">A browser-only CRUD demo with explicit save</p>
+      <p class="prototype-subtitle mt-1">A browser-only CRUD demo with automatic saving</p>
     </div>
     <span class="prototype-badge">Stateful prototype</span>
   </header>
@@ -47,10 +48,9 @@
 
   <fieldset id="controls" disabled>
     <div class="database-toolbar">
-      <span class="prototype-subtitle">Changes stay in this page until you save.</span>
+      <span class="prototype-subtitle">Changes save automatically in this browser.</span>
       <div class="client-actions">
-        <button id="reset-button" type="button" class="prototype-btn prototype-btn-secondary">Reset sample data</button>
-        <button id="save-button" type="button" class="prototype-btn prototype-btn-primary" disabled>Save</button>
+        <button id="save-button" type="button" class="prototype-btn prototype-btn-primary" hidden>Retry save</button>
       </div>
     </div>
 
@@ -88,11 +88,6 @@
 
 <script>
   (() => {
-    const sampleClients = [
-      { id: "sample-1", name: "Maya Chen", company: "Northstar Coffee", email: "maya@northstar.example", status: "active", notes: "Quarterly check-in" },
-      { id: "sample-2", name: "Leo Martin", company: "Elmwood Bikes", email: "leo@elmwood.example", status: "prospect", notes: "Send the product overview" },
-      { id: "sample-3", name: "Ari Patel", company: "Aster Labs", email: "ari@aster.example", status: "inactive", notes: "Revisit next season" },
-    ];
     const state = window.andocsState;
     const canPersist = Boolean(state && typeof state.load === "function" && typeof state.save === "function");
     const root = document.querySelector(".database");
@@ -100,10 +95,9 @@
     const form = document.querySelector("#client-form");
     const rows = document.querySelector("#client-rows");
     const saveButton = document.querySelector("#save-button");
-    const resetButton = document.querySelector("#reset-button");
     const cancelButton = document.querySelector("#cancel-button");
     const statusMessage = document.querySelector("#save-state");
-    let clients = sampleClients.map((client) => ({ ...client }));
+    let clients = [];
     let editingId = null;
     let dirty = false;
     let saving = false;
@@ -129,10 +123,13 @@
       });
     }
 
-    function markChanged(message = "Unsaved changes. Click Save to keep them after refresh.") {
+    function markChanged() {
       dirty = true;
-      saveButton.disabled = !canPersist || saving;
-      setMessage(canPersist ? message : "Preview only: the Andocs state bridge is unavailable, so changes will reset when this page refreshes.", canPersist ? "warning" : "");
+      if (!canPersist) {
+        setMessage("Preview only: the Andocs state bridge is unavailable, so changes will reset when this page refreshes.", "warning");
+        return;
+      }
+      void saveChanges();
     }
 
     function addCell(row, value, className = "") {
@@ -231,31 +228,28 @@
 
     cancelButton.addEventListener("click", clearForm);
 
-    resetButton.addEventListener("click", () => {
-      clients = sampleClients.map((client) => ({ ...client }));
-      clearForm();
-      render();
-      markChanged("Sample records restored in this page. Click Save to persist the reset.");
-    });
-
-    saveButton.addEventListener("click", async () => {
+    async function saveChanges() {
       if (!canPersist || !dirty || saving) return;
       saving = true;
-      controls.disabled = true;
-      setMessage("Saving client data…");
+      saveButton.hidden = true;
       try {
-        const value = { version: 1, clients: clients.map((client) => ({ ...client })) };
-        await state.save(value);
-        dirty = false;
+        while (dirty) {
+          dirty = false;
+          const value = { version: 1, clients: clients.map((client) => ({ ...client })) };
+          setMessage("Saving client data…");
+          await state.save(value);
+        }
         setMessage("Saved in this browser for this Andocs user, project, repository, and prototype.", "success");
       } catch (error) {
-        setMessage(`Save failed. Your edits are still on this page; try again. ${error?.message ?? ""}`.trim(), "error");
+        dirty = true;
+        saveButton.hidden = false;
+        setMessage(`Save failed. Your edits are still on this page; click Retry save. ${error?.message ?? ""}`.trim(), "error");
       } finally {
         saving = false;
-        controls.disabled = false;
-        saveButton.disabled = !canPersist || !dirty;
       }
-    });
+    }
+
+    saveButton.addEventListener("click", () => void saveChanges());
 
     async function initialize() {
       try {
@@ -264,16 +258,17 @@
         } else {
           const stored = await state.load();
           if (stored === null) {
-            setMessage("Sample records loaded. Changes stay on this page until you save.");
+            setMessage("No clients yet. Add one to save it automatically.");
           } else if (stored?.version === 1 && isClientList(stored.clients)) {
-            clients = stored.clients.map((client) => ({ ...client }));
-            setMessage("Your saved client records have been restored.", "success");
+            clients = stored.clients.filter((client) => !["sample-1", "sample-2", "sample-3"].includes(client.id));
+            if (clients.length !== stored.clients.length) markChanged();
+            else setMessage("Your saved client records have been restored.", "success");
           } else {
-            setMessage("Saved data was not a recognized client list. Sample records are shown; reset or edit them, then save to replace it.", "error");
+            setMessage("Saved data was not a recognized client list. Add a client to replace it.", "error");
           }
         }
       } catch (error) {
-        setMessage(`Could not load saved data. Sample records are shown; your existing save was not changed. ${error?.message ?? ""}`.trim(), "error");
+        setMessage(`Could not load saved data. Your existing save was not changed. ${error?.message ?? ""}`.trim(), "error");
       } finally {
         render();
         controls.disabled = false;
