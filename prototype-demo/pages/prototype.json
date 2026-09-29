@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "data": {
+    "prototypeId": "client-database",
+    "migrationVersion": 1,
+    "collections": [
+      {
+        "name": "clients"
+      }
+    ]
+  }
+}
