@@ -1,7 +1,7 @@
 {
   "version": 1,
   "data": {
-    "prototypeId": "todo",
+    "prototypeId": "task-overview",
     "collections": [{ "name": "tasks", "scope": "project" }]
   }
 }

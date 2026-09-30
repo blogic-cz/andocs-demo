@@ -1,5 +1,7 @@
 # Prototype Demo
 
+For a stateful Todo walkthrough using Andocs-managed datasets, see the [Managed Datasets guide](managed-datasets.md).
+
 > **🛠️ Want to generate prototypes like these with AI?** Install the **andocs** agent skill and let your coding agent create prototypes, HTML previews, diagrams, and documentation automatically.
 >
 > ```bash
