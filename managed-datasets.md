@@ -17,7 +17,7 @@ The hosted catalog follows the signed-in account across devices. Andocs keeps da
 ## Create and switch datasets
 
 1. Open **Team Todo** in the internal Andocs project view and open its database control.
-2. If the control finds old browser data, preview and explicitly adopt it into a named personal dataset. Confirm the old source remains intact. If there is no old data, the first open creates the empty **Moje dáta** default unless a global default applies.
+2. If the control finds old browser data, preview and explicitly adopt it into a named personal dataset. Confirm the old source remains intact. If there is no old data, the first open creates the empty **My data** default unless a global default applies.
 3. Create a named personal dataset with **New dataset**. It starts empty. Add two tasks, then open **Task Overview** to see the same tasks.
 4. An authorized project administrator can set a global default. Switch to it and verify its tasks stay independent from personal datasets.
 5. Create another personal dataset with **New dataset**. It starts empty. Switch back to the first dataset to see its tasks unchanged. Fork that dataset into a new named dataset, rename the fork, edit a task, and switch back to confirm the source is unchanged.
