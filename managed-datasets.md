@@ -6,7 +6,7 @@ The hosted catalog follows the signed-in account across devices. Andocs keeps da
 
 ## Try the prototypes
 
-```prototype path=prototype-demo/pages/todo.html title="Team Todo" height=800
+```prototype path=prototype-demo/todo/pages/index.html title="Team Todo" height=800
 
 ```
 

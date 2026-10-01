@@ -21,6 +21,9 @@ prototype-demo/
   prototype.json          # marks this folder as a prototype root
   shared.css               # smart-default styles (buttons, cards, typography)
   shared.js                # shared Web Component definitions (auto-injected)
+  todo/
+    prototype.json         # Todo tasks use project scope
+    pages/index.html       # shared Todo walkthrough
   pages/
     prototype.json        # Evolu declaration for the Client database only
     stateful-clients.html # CRUD demo using the Andocs data API
