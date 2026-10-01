@@ -96,10 +96,13 @@
           if (!Array.isArray(records) || !records.every((record) =>
             record && typeof record.id === "string" && record.value
             && typeof record.value.title === "string" && typeof record.value.completed === "boolean"
-            && Number.isFinite(record.value.createdAt))) {
+            && Number.isFinite(record.value.createdAt)
+            && (record.value.order === undefined || (typeof record.value.order === "number" && Number.isFinite(record.value.order))))) {
             throw new Error("Invalid task data");
           }
-          const tasks = [...records].sort((left, right) => left.value.createdAt - right.value.createdAt);
+          const tasks = [...records].sort((left, right) =>
+            (left.value.order ?? left.value.createdAt) - (right.value.order ?? right.value.createdAt)
+            || left.value.createdAt - right.value.createdAt || left.id.localeCompare(right.id));
           list.replaceChildren();
           if (!tasks.length) {
             const empty = document.createElement("li");

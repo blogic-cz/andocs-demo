@@ -73,6 +73,15 @@
       .task-status { min-height: 1.5em; color: var(--muted-foreground); font-size: 0.8125rem; }
       .task-status[data-kind="error"] { color: #a33b20; }
       .task-list [hidden] { display: none; }
+      .task-row { position: relative; }
+      .task-row.is-dragging { opacity: 0.45; }
+      .task-row[data-drop]::before { content: ""; position: absolute; left: 0; right: 0; height: 2px; border-radius: 2px; background: var(--primary); }
+      .task-row[data-drop="before"]::before { top: -5px; }
+      .task-row[data-drop="after"]::before { bottom: -5px; }
+      .drag-handle { display: grid; place-items: center; width: 28px; height: 36px; margin-left: -4px; padding: 0; border: 0; border-radius: calc(var(--radius) - 2px); background: transparent; color: var(--muted-foreground); cursor: grab; }
+      .drag-handle:hover { background: var(--muted); color: var(--foreground); }
+      .drag-handle:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+      .drag-handle:active { cursor: grabbing; }
       .todo [disabled] { opacity: 0.6; }
       @media (max-width: 560px) { body { padding: 12px; } .todo-header { padding: 18px; } .todo-content { padding: 0 18px 18px; } .task-form { flex-direction: column; } }
     </style>
@@ -81,7 +90,7 @@
     <main class="prototype-shell todo" aria-busy="true">
       <header class="todo-header">
         <div>
-          <h1 class="prototype-title">Team Todo · OpenDesign</h1>
+          <h1 class="prototype-title">Team Todo</h1>
           <p class="prototype-subtitle mt-1">A shared task list for your project</p>
         </div>
         <span class="prototype-badge">Shared tasks</span>
@@ -113,6 +122,10 @@
         let busy = true;
         let stopped = false;
         let unsubscribe = () => {};
+        let dragId = null;
+        let focusHandleId = null;
+        // ponytail: legacy tasks without `order` fall back to createdAt, so no migration write is needed.
+        const sortKey = (task) => task.order ?? task.createdAt;
 
         function setStatus(message, kind = "") {
           status.textContent = message;
@@ -124,7 +137,8 @@
             && typeof task.title === "string" && task.title.trim() !== ""
             && typeof task.completed === "boolean"
             && typeof task.createdAt === "number" && Number.isFinite(task.createdAt)
-            && typeof task.updatedAt === "number" && Number.isFinite(task.updatedAt);
+            && typeof task.updatedAt === "number" && Number.isFinite(task.updatedAt)
+            && (task.order === undefined || (typeof task.order === "number" && Number.isFinite(task.order)));
         }
 
         function stopWithError(message) {
@@ -141,7 +155,8 @@
             return;
           }
           tasks = records.map(({ id, value }) => ({ ...value, id }))
-            .sort((left, right) => left.createdAt - right.createdAt || left.id.localeCompare(right.id));
+            .sort((left, right) => sortKey(left) - sortKey(right)
+              || left.createdAt - right.createdAt || left.id.localeCompare(right.id));
           if (editingId && !tasks.some((task) => task.id === editingId)) clearForm();
           render();
         }
@@ -157,6 +172,24 @@
           for (const task of tasks) {
             const row = document.createElement("li");
             row.className = "task-row";
+            row.dataset.id = task.id;
+            row.draggable = !(busy || stopped);
+            const handle = document.createElement("button");
+            handle.type = "button";
+            handle.className = "drag-handle";
+            handle.dataset.id = task.id;
+            handle.disabled = busy || stopped;
+            handle.setAttribute("aria-label", `Reorder ${task.title}. Use arrow up or down to move.`);
+            handle.innerHTML = '<svg width="12" height="18" viewBox="0 0 12 18" aria-hidden="true" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="9" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="3" cy="15" r="1.5"/><circle cx="9" cy="15" r="1.5"/></svg>';
+            handle.addEventListener("keydown", (event) => {
+              const step = event.key === "ArrowUp" ? -1 : event.key === "ArrowDown" ? 1 : 0;
+              if (!step) return;
+              event.preventDefault();
+              const index = tasks.findIndex((item) => item.id === task.id) + step;
+              if (index < 0 || index >= tasks.length) return;
+              focusHandleId = task.id;
+              placeTask(task.id, index);
+            });
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             checkbox.id = `task-${task.id}`;
@@ -180,8 +213,12 @@
               button.addEventListener("click", action);
               actions.append(button);
             }
-            row.append(checkbox, label, actions);
+            row.append(handle, checkbox, label, actions);
             list.append(row);
+          }
+          if (focusHandleId && !busy) {
+            list.querySelector(`.drag-handle[data-id="${CSS.escape(focusHandleId)}"]`)?.focus();
+            focusHandleId = null;
           }
           for (const control of form.elements) control.disabled = busy || stopped;
           cancelButton.hidden = editingId === null;
@@ -219,10 +256,70 @@
           }
         }
 
-        function changeTask(task, changes) {
+        function changeTask(task, changes, message = "Task saved on this device.") {
           const next = { ...task, ...changes, updatedAt: Date.now() };
-          return write(() => data.update("tasks", task.id, next), "Task saved on this device.");
+          return write(() => data.update("tasks", task.id, next), message);
         }
+
+        // Moves one task to `index` in the visible order with a single write: its order becomes the midpoint of its new neighbours.
+        function placeTask(id, index) {
+          const task = tasks.find((item) => item.id === id);
+          const rest = tasks.filter((item) => item.id !== id);
+          if (!task || tasks.indexOf(task) === index) return;
+          const prev = rest[index - 1];
+          const next = rest[index];
+          const order = prev && next ? (sortKey(prev) + sortKey(next)) / 2
+            : prev ? sortKey(prev) + 1000
+            : next ? sortKey(next) - 1000
+            : sortKey(task);
+          return changeTask(task, { order }, "Task moved.");
+        }
+
+        function clearDropMarkers() {
+          for (const row of list.querySelectorAll("[data-drop]")) delete row.dataset.drop;
+        }
+
+        function dropPosition(event) {
+          const row = event.target.closest?.(".task-row");
+          if (!row || !dragId || row.dataset.id === dragId) return null;
+          const box = row.getBoundingClientRect();
+          return { row, before: event.clientY < box.top + box.height / 2 };
+        }
+
+        list.addEventListener("dragstart", (event) => {
+          const row = event.target.closest?.(".task-row");
+          if (!row || busy || stopped) return event.preventDefault();
+          dragId = row.dataset.id;
+          event.dataTransfer.effectAllowed = "move";
+          event.dataTransfer.setData("text/plain", dragId);
+          row.classList.add("is-dragging");
+        });
+        list.addEventListener("dragover", (event) => {
+          const target = dropPosition(event);
+          if (!target) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "move";
+          const side = target.before ? "before" : "after";
+          if (target.row.dataset.drop === side) return;
+          clearDropMarkers();
+          target.row.dataset.drop = side;
+        });
+        list.addEventListener("dragleave", (event) => {
+          if (!list.contains(event.relatedTarget)) clearDropMarkers();
+        });
+        list.addEventListener("drop", (event) => {
+          const target = dropPosition(event);
+          if (!target) return;
+          event.preventDefault();
+          const rest = tasks.filter((item) => item.id !== dragId);
+          const index = rest.findIndex((item) => item.id === target.row.dataset.id) + (target.before ? 0 : 1);
+          placeTask(dragId, index);
+        });
+        list.addEventListener("dragend", () => {
+          clearDropMarkers();
+          list.querySelector(".is-dragging")?.classList.remove("is-dragging");
+          dragId = null;
+        });
 
         function removeTask(task) {
           return write(() => data.delete("tasks", task.id), "Task deleted.");
