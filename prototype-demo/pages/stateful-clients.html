@@ -38,7 +38,7 @@
   <header class="database-header">
     <div>
       <h1 class="prototype-title">Client database</h1>
-      <p class="prototype-subtitle mt-1">A browser-only CRUD demo with automatic saving</p>
+      <p class="prototype-subtitle mt-1">Client records with automatic local saving</p>
     </div>
     <span class="prototype-badge">Stateful prototype</span>
   </header>
@@ -49,9 +49,7 @@
   <fieldset id="controls" disabled>
     <div class="database-toolbar">
       <span class="prototype-subtitle">Changes save automatically in this browser.</span>
-      <div class="client-actions">
-        <button id="save-button" type="button" class="prototype-btn prototype-btn-primary" hidden>Retry save</button>
-      </div>
+      <span id="sync-state" class="prototype-subtitle" role="status" aria-live="polite"></span>
     </div>
 
     <div class="database-body">
@@ -88,48 +86,63 @@
 
 <script>
   (() => {
-    const state = window.andocsState;
-    const canPersist = Boolean(state && typeof state.load === "function" && typeof state.save === "function");
+    const data = window.andocsData;
     const root = document.querySelector(".database");
     const controls = document.querySelector("#controls");
     const form = document.querySelector("#client-form");
     const rows = document.querySelector("#client-rows");
-    const saveButton = document.querySelector("#save-button");
     const cancelButton = document.querySelector("#cancel-button");
     const statusMessage = document.querySelector("#save-state");
     let clients = [];
     let editingId = null;
-    let dirty = false;
     let saving = false;
-    let idSequence = 0;
+    let failed = false;
+    let unsubscribe = () => {};
+    let unsubscribeStatus = () => {};
 
     function setMessage(message, kind = "") {
       statusMessage.textContent = message;
       statusMessage.dataset.kind = kind;
     }
 
-    function isClientList(value) {
-      if (!Array.isArray(value)) return false;
+    function isClient(client) {
+      return client && typeof client === "object" && !Array.isArray(client)
+        && ["name", "company", "email", "status", "notes"].every((key) => typeof client[key] === "string")
+        && client.name.trim() !== "" && client.company.trim() !== ""
+        && ["prospect", "active", "inactive"].includes(client.status);
+    }
+
+    function migrateClients(stored) {
+      if (!stored || stored.version !== 1 || !Array.isArray(stored.clients)) {
+        throw new Error("Saved data is not a recognized client list.");
+      }
       const ids = new Set();
-      return value.every((client) => {
-        if (!client || typeof client !== "object" || Array.isArray(client)) return false;
-        const valid = ["id", "name", "company", "email", "status", "notes"].every((key) => typeof client[key] === "string")
-          && client.name.trim() !== ""
-          && client.company.trim() !== ""
-          && ["prospect", "active", "inactive"].includes(client.status)
-          && !ids.has(client.id);
-        if (valid) ids.add(client.id);
-        return valid;
+      return stored.clients.flatMap((client) => {
+        if (!isClient(client) || typeof client.id !== "string" || !client.id || ids.has(client.id)) {
+          throw new Error("Saved client data is invalid.");
+        }
+        ids.add(client.id);
+        // These IDs were retired by the original demo; never import its sample rows.
+        if (["sample-1", "sample-2", "sample-3"].includes(client.id)) return [];
+        const { name, company, email, status, notes } = client;
+        return [{ collection: "clients", legacyId: client.id, value: { name, company, email, status, notes } }];
       });
     }
 
-    function markChanged() {
-      dirty = true;
-      if (!canPersist) {
-        setMessage("Preview only: the Andocs state bridge is unavailable, so changes will reset when this page refreshes.", "warning");
+    function stopEditing(message) {
+      failed = true;
+      controls.disabled = true;
+      setMessage(message, "error");
+    }
+
+    function receiveRecords(records) {
+      if (!Array.isArray(records) || !records.every((record) => record && typeof record.id === "string" && isClient(record.value))) {
+        stopEditing("Stored records could not be displayed. Editing is disabled; reload the page to retry.");
         return;
       }
-      void saveChanges();
+      clients = records.map((record) => ({ ...record.value, id: record.id }));
+      if (editingId && !clients.some((client) => client.id === editingId)) clearForm();
+      render();
     }
 
     function addCell(row, value, className = "") {
@@ -195,11 +208,28 @@
       form.elements.name.focus();
     }
 
+    async function saveChange(operation, onSaved) {
+      if (saving || failed || controls.disabled) return;
+      saving = true;
+      controls.disabled = true;
+      setMessage("Saving client data…");
+      try {
+        await operation();
+        receiveRecords(await data.list("clients"));
+        if (!failed) onSaved();
+        if (!failed) setMessage("Saved in this browser. Relay status does not confirm this individual save.", "success");
+      } catch {
+        stopEditing("The save could not be confirmed. Reload the page to check stored records before trying again. Your form is still here.");
+      } finally {
+        saving = false;
+        controls.disabled = failed;
+      }
+    }
+
     function removeClient(client) {
-      clients = clients.filter((item) => item.id !== client.id);
-      if (editingId === client.id) clearForm();
-      render();
-      markChanged();
+      return saveChange(() => data.delete("clients", client.id), () => {
+        if (editingId === client.id) clearForm();
+      });
     }
 
     function addOrUpdateClient() {
@@ -210,68 +240,49 @@
       }
       const values = Object.fromEntries(new FormData(form));
       const client = {
-        id: editingId ?? `client-${Date.now()}-${++idSequence}`,
         name: values.name.trim(),
         company: values.company.trim(),
         email: values.email.trim(),
         status: values.status,
         notes: values.notes.trim(),
       };
-      if (editingId) clients = clients.map((item) => item.id === editingId ? client : item);
-      else clients = [client, ...clients];
-      clearForm();
-      render();
-      markChanged();
+      if (!isClient(client)) {
+        setMessage("Enter a name and company with more than spaces.", "error");
+        return;
+      }
+      const id = editingId;
+      return saveChange(
+        () => id ? data.update("clients", id, client) : data.create("clients", client),
+        clearForm,
+      );
     }
 
     document.querySelector("#submit-button").addEventListener("click", addOrUpdateClient);
-
+    form.addEventListener("submit", (event) => { event.preventDefault(); void addOrUpdateClient(); });
     cancelButton.addEventListener("click", clearForm);
-
-    async function saveChanges() {
-      if (!canPersist || !dirty || saving) return;
-      saving = true;
-      saveButton.hidden = true;
-      try {
-        while (dirty) {
-          dirty = false;
-          const value = { version: 1, clients: clients.map((client) => ({ ...client })) };
-          setMessage("Saving client data…");
-          await state.save(value);
-        }
-        setMessage("Saved in this browser for this Andocs user, project, repository, and prototype.", "success");
-      } catch (error) {
-        dirty = true;
-        saveButton.hidden = false;
-        setMessage(`Save failed. Your edits are still on this page; click Retry save. ${error?.message ?? ""}`.trim(), "error");
-      } finally {
-        saving = false;
-      }
-    }
-
-    saveButton.addEventListener("click", () => void saveChanges());
+    window.addEventListener("pagehide", () => { unsubscribe(); unsubscribeStatus(); });
 
     async function initialize() {
       try {
-        if (!canPersist) {
-          setMessage("Preview only: the Andocs state bridge is unavailable. Changes work here but reset when you refresh.", "warning");
-        } else {
-          const stored = await state.load();
-          if (stored === null) {
-            setMessage("No clients yet. Add one to save it automatically.");
-          } else if (stored?.version === 1 && isClientList(stored.clients)) {
-            clients = stored.clients.filter((client) => !["sample-1", "sample-2", "sample-3"].includes(client.id));
-            if (clients.length !== stored.clients.length) markChanged();
-            else setMessage("Your saved client records have been restored.", "success");
-          } else {
-            setMessage("Saved data was not a recognized client list. Add a client to replace it.", "error");
-          }
-        }
-      } catch (error) {
-        setMessage(`Could not load saved data. Your existing save was not changed. ${error?.message ?? ""}`.trim(), "error");
+        if (!data) throw new Error("Prototype data is unavailable.");
+        data.registerMigration(1, migrateClients);
+        await data.ready;
+        receiveRecords(await data.list("clients"));
+        if (failed) return;
+        receiveRecords.error = () => stopEditing("Live updates failed. Reload the page before editing more records.");
+        unsubscribe = data.subscribe("clients", receiveRecords);
+        const showSyncStatus = (status) => {
+          document.querySelector("#sync-state").textContent = `Relay: ${status}`;
+        };
+        showSyncStatus.error = () => showSyncStatus("unavailable");
+        unsubscribeStatus = data.subscribeSyncStatus(showSyncStatus);
+        if (failed) return;
+        controls.disabled = false;
+        setMessage(clients.length ? "Your saved client records have been restored." : "No clients yet. Add one to save it automatically.", "success");
+      } catch {
+        stopEditing("Client data could not be opened or migrated. Existing saved data was not replaced. Reload the page to retry.");
       } finally {
         render();
-        controls.disabled = false;
         root.setAttribute("aria-busy", "false");
       }
     }

@@ -1,18 +1,30 @@
-# Stateful Prototypes
+# Stateful prototypes
 
-This client database demonstrates browser-local JSON persistence in an Andocs prototype. The table starts empty. Add, edit, or delete a client, then refresh the page to see the automatically saved records.
+This client database uses Evolu through the Andocs data API. The table starts empty. Add, edit, or delete a client, then refresh the page to see the locally saved records. Live subscriptions update the table when stored records change.
 
 ```prototype path=prototype-demo/pages/stateful-clients.html title="Stateful Client Database" height=800
 
 ```
 
-The prototype uses `window.andocsState.load()` to read a JSON value and `window.andocsState.save(value)` to write it. Andocs scopes the value to the authenticated user, project, repository, and prototype path in this browser. It does not sync to a server or another browser. If the state bridge is unavailable, the page still supports CRUD for the current view and explains that a refresh will reset it.
+Only `prototype-demo/pages/prototype.json` declares data. The Counter, Client Dashboard, Web Components, and Team Dashboard pages live in `prototype-demo/stateless/` under the original configuration without a data declaration.
+
+The Client database keeps its original HTML path so the trusted Andocs host can find its previous save. Before opening the database, the page registers a pure version 1 mapper for the old `{ version: 1, clients: [...] }` snapshot. It validates every client and maps each legacy ID into the `clients` collection. The three retired sample IDs, `sample-1`, `sample-2`, and `sample-3`, are excluded, as they were in the previous demo. No samples are seeded.
 
 ```js
-const saved = await window.andocsState.load();
-if (saved !== null) clients = saved.clients;
+window.andocsData.registerMigration(1, migrateClients);
+await window.andocsData.ready;
 
-await window.andocsState.save({ version: 1, clients });
+const records = await window.andocsData.list("clients");
+const stop = window.andocsData.subscribe("clients", renderRecords);
+
+await window.andocsData.create("clients", {
+  name: "Ada", company: "Example", email: "ada@example.com",
+  status: "prospect", notes: "",
+});
 ```
 
-The page validates saved records before restoring them and removes the three old sample records from existing saves. Changes save automatically after each add, edit, or delete. If saving fails, the current records remain visible and a **Retry save** button appears. Its **Add client** button handles clicks directly because the sandboxed prototype iframe allows scripts but does not allow native form submission.
+The trusted host selects the legacy source and performs the import. The original save is preserved. A durable migration ledger prevents reloads from importing the same records again or replacing later edits and deletions. The page cannot edit records until migration succeeds. An invalid save or unavailable data host leaves editing disabled and shows a reload instruction.
+
+Each add, edit, or delete waits for local storage confirmation. A failed or uncertain write keeps editing disabled until reload so a repeated click cannot create a duplicate. The relay status describes the database connection; it does not confirm that a particular save reached the relay.
+
+Standalone OpenDesign and Andocs use separate local identities on their respective origins. Opening this HTML in OpenDesign does not import the Andocs save or make the two views share records. Standalone editing requires the trusted data host provided by a compatible Andocs CLI and its OpenDesign preview integration.
