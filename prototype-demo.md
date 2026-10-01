@@ -22,9 +22,11 @@ prototype-demo/
   shared.css               # smart-default styles (buttons, cards, typography)
   shared.js                # shared Web Component definitions (auto-injected)
   pages/
+    prototype.json        # Evolu declaration for the Client database only
+    stateful-clients.html # CRUD demo using the Andocs data API
+  stateless/
     counter.html           # simple interactive counter
     crm.html               # multi-page CRM dashboard with client detail
-    stateful-clients.html  # CRUD demo using the Andocs state bridge
     web-components.html    # Web Components showcase
     team-dashboard.html    # reuses same components in a different layout
 ```
@@ -33,7 +35,7 @@ prototype-demo/
 
 A simple counter demonstrating basic Alpine.js reactivity and the smart-default CSS classes.
 
-```prototype path=prototype-demo/pages/counter.html
+```prototype path=prototype-demo/stateless/counter.html
 
 ```
 
@@ -41,7 +43,7 @@ A simple counter demonstrating basic Alpine.js reactivity and the smart-default 
 
 A more complex prototype with **navigation between pages** — click a client row to open the detail view, then navigate back. All powered by Alpine.js state management within a single HTML file.
 
-```prototype path=prototype-demo/pages/crm.html
+```prototype path=prototype-demo/stateless/crm.html
 
 ```
 
@@ -85,7 +87,7 @@ customElements.define("status-badge", StatusBadge);
 
 All three components demonstrated with usage examples — badges, slotted cards, and interactive toggles wired to Alpine.js state.
 
-```prototype path=prototype-demo/pages/web-components.html title="Component Showcase" height=800
+```prototype path=prototype-demo/stateless/web-components.html title="Component Showcase" height=800
 
 ```
 
@@ -93,7 +95,7 @@ All three components demonstrated with usage examples — badges, slotted cards,
 
 The **same components** reused in a completely different context — team member cards with status badges and notification toggles. Zero code duplication.
 
-```prototype path=prototype-demo/pages/team-dashboard.html title="Team Dashboard" height=800
+```prototype path=prototype-demo/stateless/team-dashboard.html title="Team Dashboard" height=800
 
 ```
 
