@@ -17,7 +17,7 @@ The hosted catalog follows the signed-in account across devices. Andocs keeps da
 ## Create and switch datasets
 
 1. Open **Team Todo** in the internal Andocs project view and open its database control.
-2. If the control finds old browser data, preview and explicitly adopt it into a named personal dataset. Confirm the old source remains intact. If there is no old data, the first open creates the empty **My data** default unless a global default applies.
+2. Select the permitted dataset, or use the applicable global or personal default. If none applies, the first open creates an empty personal dataset named **My data**. Historical browser-only data is left untouched: Andocs does not inspect, import, or delete it during managed-dataset setup.
 3. Create a named personal dataset with **New dataset**. It starts empty. Add two tasks, then open **Task Overview** to see the same tasks.
 4. An authorized project administrator can set a global default. Switch to it and verify its tasks stay independent from personal datasets.
 5. Create another personal dataset with **New dataset**. It starts empty. Switch back to the first dataset to see its tasks unchanged. Fork that dataset into a new named dataset, rename the fork, edit a task, and switch back to confirm the source is unchanged.
@@ -33,8 +33,8 @@ The hosted catalog follows the signed-in account across devices. Andocs keeps da
 
 ## OpenDesign handoff
 
-1. In the CLI host, create/select a named dataset, add recognizable marker tasks, then choose **Edit in OpenDesign**. This uses the CLI's anonymous local catalog; it is separate from the hosted account catalog.
+1. In the CLI host, create/select a named dataset, add recognizable marker tasks, then choose **OpenDesign**. This uses the CLI's anonymous local catalog; it is separate from the hosted account catalog.
 2. In OpenDesign, edit a task and save a source-file change. Confirm the task appears in the CLI view and the HTML source change returns to the repository.
-3. Select a different CLI dataset. The existing OpenDesign view remains on its handed-off dataset. Choose **Edit in OpenDesign** again to hand off the newly selected dataset.
+3. Select a different CLI dataset. The existing OpenDesign view remains on its handed-off dataset. Choose **OpenDesign** again to hand off the newly selected dataset.
 
 The Todo page uses only `window.andocsData` and the declared `tasks` collection. Dataset selection, naming, sharing, and fork controls stay in trusted host UIs; they are not exposed to prototype HTML. Dataset identities are never implicitly merged across hosted, local CLI, browser-origin, or historical OpenDesign storage.
