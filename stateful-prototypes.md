@@ -1,6 +1,6 @@
 # Stateful prototypes
 
-This client database uses Evolu through the Andocs data API. The table starts empty. Add, edit, or delete a client, then refresh the page to see the locally saved records. Live subscriptions update the table when stored records change.
+This client database uses a named Andocs-managed dataset through the Andocs data API. Choose the same dataset in Andocs and in the OpenDesign preview to see the same records. The table starts empty. Add, edit, or delete a client, then refresh to see the saved records. Live subscriptions update the table when stored records change.
 
 ```prototype path=prototype-demo/pages/stateful-clients.html title="Stateful Client Database" height=800
 
@@ -8,23 +8,21 @@ This client database uses Evolu through the Andocs data API. The table starts em
 
 Only `prototype-demo/pages/prototype.json` declares data. The Counter, Client Dashboard, Web Components, and Team Dashboard pages live in `prototype-demo/stateless/` under the original configuration without a data declaration.
 
-The Client database keeps its original HTML path so the trusted Andocs host can find its previous save. Before opening the database, the page registers a pure version 1 mapper for the old `{ version: 1, clients: [...] }` snapshot. It validates every client and maps each legacy ID into the `clients` collection. The three retired sample IDs, `sample-1`, `sample-2`, and `sample-3`, are excluded, as they were in the previous demo. No samples are seeded.
+The dataset is shared through the configured Evolu relay. Each origin keeps its own local copy, so offline edits can sync when that origin reconnects. Select the same named dataset in both host views; separate datasets remain independent. Public sharing uses a pinned shared dataset and a share link.
+
+The page uses the declared `clients` collection through `window.andocsData`:
 
 ```js
-window.andocsData.registerMigration(1, migrateClients);
-await window.andocsData.ready;
+const data = window.andocsData;
+await data.ready;
 
-const records = await window.andocsData.list("clients");
-const stop = window.andocsData.subscribe("clients", renderRecords);
+const records = await data.list("clients");
+const stop = data.subscribe("clients", renderRecords);
 
-await window.andocsData.create("clients", {
+await data.create("clients", {
   name: "Ada", company: "Example", email: "ada@example.com",
   status: "prospect", notes: "",
 });
 ```
 
-The trusted host selects the legacy source and performs the import. The original save is preserved. A durable migration ledger prevents reloads from importing the same records again or replacing later edits and deletions. The page cannot edit records until migration succeeds. An invalid save or unavailable data host leaves editing disabled and shows a reload instruction.
-
-Each add, edit, or delete waits for local storage confirmation. A failed or uncertain write keeps editing disabled until reload so a repeated click cannot create a duplicate. The relay status describes the database connection; it does not confirm that a particular save reached the relay.
-
-Standalone OpenDesign and Andocs use separate local identities on their respective origins. Opening this HTML in OpenDesign does not import the Andocs save or make the two views share records. Standalone editing requires the trusted data host provided by a compatible Andocs CLI and its OpenDesign preview integration.
+The page declares a mapper for the old browser snapshot format, but the managed data host does not select a legacy source or automatically import old browser data. OpenDesign uses the named dataset selected by Andocs CLI 2.2.6 or later. The CLI shares the dataset through the relay; this demo does not run its own backend. Each add, edit, or delete waits for local storage confirmation. The relay status describes the database connection; it does not confirm that a particular save reached the relay.
