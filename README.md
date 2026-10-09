@@ -6,8 +6,8 @@ This folder contains demo documentation showcasing what Andocs can render. Use t
 
 You do not need to install anything by hand.
 
-1. Open an empty folder in VS Code.
-2. Open Claude Code.
+1. Open the Claude app on the **Code** tab, or the Codex app.
+2. Choose an empty folder as the project.
 3. Paste this prompt:
 
 ```text
