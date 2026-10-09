@@ -2,15 +2,21 @@
 
 This folder contains demo documentation showcasing what Andocs can render. Use these files as sample content for the **Andocs Demo** project.
 
-> **🛠️ AI Agent Skill available!** Install the **andocs** skill to let your coding agent generate documentation, prototypes, diagrams, and HTML previews automatically:
->
-> ```bash
-> npx skills add blogic-cz/blogic-marketplace --skill andocs
-> ```
->
-> Works with Claude Code, Cursor, Copilot, Windsurf, and [35+ other agents](https://skills.sh). The skill teaches your agent the correct syntax for all Andocs features — `prototype` blocks, `html-preview`, Mermaid diagrams, math formulas, Web Components, and more.
->
-> 📖 **Skill source & docs:** [blogic-cz/blogic-marketplace](https://github.com/blogic-cz/blogic-marketplace/tree/main/agent-kit/skills/andocs)
+## Start here
+
+You do not need to install anything by hand.
+
+1. Open the Claude app on the **Code** tab, or the Codex app.
+2. Choose an empty folder as the project.
+3. Paste this prompt:
+
+```text
+Nainstaluj mi skill https://github.com/blogic-cz/blogic-marketplace/tree/main/template-ts/skills/andocs a udělej mi představení Andocs.
+```
+
+The agent installs the **andocs** skill, asks where to work, and guides you from a need to a clickable prototype.
+
+To install the skill without the introduction, run `npx skills add blogic-cz/blogic-marketplace --skill andocs`. It works with Claude Code, Cursor, Copilot, Windsurf, and [other agents](https://skills.sh). Skill source: [blogic-cz/blogic-marketplace](https://github.com/blogic-cz/blogic-marketplace/tree/main/template-ts/skills/andocs).
 
 ## Contents
 
