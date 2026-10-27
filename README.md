@@ -11,12 +11,10 @@ You do not need to install anything by hand.
 3. Paste this prompt:
 
 ```text
-Nainstaluj mi skill https://github.com/blogic-cz/blogic-marketplace/tree/main/template-ts/skills/andocs a udělej mi představení Andocs.
+Pusť `bunx andocs@latest agent` a postupuj podle jeho pokynů. Udělej mi představení Andocs. Než cokoli vytvoříš, zeptej se mě, co chci vytvořit, a dej mi pár příkladů. Pokud chybí Bun, nainstaluj ho.
 ```
 
-The agent installs the **andocs** skill, asks where to work, and guides you from a need to a clickable prototype.
-
-To install the skill without the introduction, run `npx skills add blogic-cz/blogic-marketplace --skill andocs`. It works with Claude Code, Cursor, Copilot, Windsurf, and [other agents](https://skills.sh). Skill source: [blogic-cz/blogic-marketplace](https://github.com/blogic-cz/blogic-marketplace/tree/main/template-ts/skills/andocs).
+The agent starts the Andocs CLI and follows its instructions. It installs Bun if it is missing. Before it creates anything, it asks what you want to build and shows a few examples. Then it guides you from a need to a clickable prototype.
 
 ## Contents
 
@@ -43,11 +41,7 @@ To install the skill without the introduction, run `npx skills add blogic-cz/blo
 
 ## Generate with AI
 
-Instead of writing documentation manually, use the **andocs** agent skill. Your AI coding agent will know all the syntax, conventions, and best practices:
-
-```bash
-npx skills add blogic-cz/blogic-marketplace --skill andocs
-```
+Instead of writing documentation manually, paste the prompt from [Start here](#start-here) into your AI coding agent. It will know all the syntax, conventions, and best practices.
 
 Then just tell your agent what you need:
 

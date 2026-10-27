@@ -1,14 +1,12 @@
 # HTML Preview Blocks
 
-> **🛠️ Want your AI agent to generate HTML previews like these?** Install the **andocs** skill:
+> **🛠️ Want your AI agent to generate HTML previews like these?** Open the Claude app on the **Code** tab, or the Codex app, choose an empty folder, and paste this prompt:
 >
-> ```bash
-> npx skills add blogic-cz/blogic-marketplace --skill andocs
+> ```text
+> Pusť `bunx andocs@latest agent` a postupuj podle jeho pokynů. Udělej mi představení Andocs. Než cokoli vytvoříš, zeptej se mě, co chci vytvořit, a dej mi pár příkladů. Pokud chybí Bun, nainstaluj ho.
 > ```
 >
-> The skill teaches your coding agent the correct `html-preview` syntax, auto-resize patterns, and all Andocs rendering features. Works with Claude Code, Cursor, Copilot, Windsurf, and [35+ other agents](https://skills.sh).
->
-> 📖 **Skill source & docs:** [blogic-cz/blogic-marketplace](https://github.com/blogic-cz/blogic-marketplace/tree/main/agent-kit/skills/andocs)
+> The agent starts the Andocs CLI and follows its instructions. It asks what you want to build, shows a few examples, and guides you to a clickable result. See [Start here](README.md#start-here).
 
 andocs supports embedding interactive HTML prototypes directly inside markdown documentation using `html-preview` code blocks. This is useful for sharing UI mockups, form prototypes, and interactive demos with your team — without leaving the documentation.
 
@@ -898,8 +896,4 @@ Below is a complex, fully interactive fintech loan application form. It demonstr
 
 ---
 
-> **💡 Tip:** Instead of writing HTML previews by hand, let your AI coding agent do it. Install the **andocs** agent skill and describe what you want — the agent handles the HTML, CSS, JS, and auto-resize boilerplate.
->
-> ```bash
-> npx skills add blogic-cz/blogic-marketplace --skill andocs
-> ```
+> **💡 Tip:** Instead of writing HTML previews by hand, let your AI coding agent do it. Paste the prompt from [Start here](README.md#start-here) and describe what you want — the agent handles the HTML, CSS, JS, and auto-resize boilerplate.

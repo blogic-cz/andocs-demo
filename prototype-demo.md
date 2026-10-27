@@ -2,15 +2,13 @@
 
 For a stateful Todo walkthrough using Andocs-managed datasets, see the [Managed Datasets guide](managed-datasets.md).
 
-> **🛠️ Want to generate prototypes like these with AI?** Install the **andocs** agent skill and let your coding agent create prototypes, HTML previews, diagrams, and documentation automatically.
+> **🛠️ Want to generate prototypes like these with AI?** Open the Claude app on the **Code** tab, or the Codex app, choose an empty folder, and paste this prompt:
 >
-> ```bash
-> npx skills add blogic-cz/blogic-marketplace --skill andocs
+> ```text
+> Pusť `bunx andocs@latest agent` a postupuj podle jeho pokynů. Udělej mi představení Andocs. Než cokoli vytvoříš, zeptej se mě, co chci vytvořit, a dej mi pár příkladů. Pokud chybí Bun, nainstaluj ho.
 > ```
 >
-> The skill works with Claude Code, Cursor, Copilot, Windsurf, and [35+ other agents](https://skills.sh). It teaches your agent the correct `prototype` syntax, `prototype.json` configuration, shared CSS/JS conventions, Web Components patterns, and all Andocs rendering features.
->
-> 📖 **Skill source & docs:** [blogic-cz/blogic-marketplace](https://github.com/blogic-cz/blogic-marketplace/tree/main/agent-kit/skills/andocs)
+> The agent starts the Andocs CLI and follows its instructions. It asks what you want to build, shows a few examples, and guides you to a clickable prototype. See [Start here](README.md#start-here).
 
 This page demonstrates how to embed external HTML prototypes using the `prototype` block. Prototypes run inside sandboxed iframes with **Tailwind CSS** and **Alpine.js** injected automatically.
 
@@ -132,8 +130,4 @@ The page below uses `.prototype-shell`, `.prototype-title`, `.prototype-btn` fro
 
 ---
 
-> **💡 Tip:** Don't write prototypes manually — use the **andocs** agent skill! Your AI coding agent will generate all of this for you: `prototype.json`, `shared.css`, `shared.js`, multi-page HTML, Web Components, and the correct markdown syntax.
->
-> ```bash
-> npx skills add blogic-cz/blogic-marketplace --skill andocs
-> ```
+> **💡 Tip:** Don't write prototypes manually. Paste the prompt from [Start here](README.md#start-here) into your AI coding agent. It will generate all of this for you: `prototype.json`, `shared.css`, `shared.js`, multi-page HTML, Web Components, and the correct markdown syntax.
